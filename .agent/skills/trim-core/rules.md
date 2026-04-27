@@ -1,0 +1,8 @@
+- Never mix business logic inside API routes
+- AI/ML code must live only in /backend/models
+- External integrations must live in /backend/services
+- Mobile apps must not contain business logic
+- All features must map to one of the defined core features
+- Maintain strict folder structure at all times
+- Do not introduce new technologies outside defined stack
+- All code must be production-scalable

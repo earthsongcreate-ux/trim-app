@@ -1,0 +1,63 @@
+# Environment Variables
+.env
+.env.*
+!.env.example
+
+# Dependencies
+node_modules/
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+# Build Outputs
+dist/
+build/
+.next/
+out/
+bin/
+obj/
+
+# Python
+venv/
+.venv/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+env/
+pip-log.txt
+pip-delete-this-directory.txt
+.tox/
+.coverage
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+*.log
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+Icon
+._*
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# iOS / Xcode
+DerivedData/
+*.xcworkspace
+!default.xcworkspace
+Pods/
+Podfile.lock
+*.xcuserstate
+*.xcscheme
+*.app
+*.ipa
+*.dSYM.zip
+*.dSYM

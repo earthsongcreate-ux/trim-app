@@ -1,0 +1,3 @@
+- Never block core value behind paywall
+- Monetization must feel earned
+- Avoid aggressive upselling

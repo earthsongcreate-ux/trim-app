@@ -1,0 +1,3 @@
+- Always assume income variability
+- Prioritize safety buffers
+- Avoid optimistic projections

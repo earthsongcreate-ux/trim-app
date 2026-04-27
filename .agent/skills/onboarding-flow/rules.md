@@ -1,0 +1,6 @@
+- Time-to-value must be under 60 seconds
+- Minimize friction (no long forms)
+- Personalize early (2–3 inputs max)
+- Use action-based onboarding instead of tutorials
+- Do not force signup before value is shown
+- Avoid multi-screen explanations

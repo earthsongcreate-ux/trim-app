@@ -1,0 +1,3 @@
+- Do not send notifications without clear value
+- Avoid notification fatigue
+- Respect user attention as a limited resource

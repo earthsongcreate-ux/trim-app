@@ -1,0 +1,3 @@
+- Never shame or guilt users
+- Keep messaging short and actionable
+- Focus on timing relevance

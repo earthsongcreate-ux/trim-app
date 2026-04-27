@@ -1,0 +1,3 @@
+- Never use hostile or deceptive language
+- Always align tone with brand trust
+- Prioritize realistic negotiation outcomes

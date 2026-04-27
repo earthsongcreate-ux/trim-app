@@ -1,0 +1,3 @@
+- Never display raw transaction data without classification
+- Always assign confidence levels
+- Do not assume subscriptions without pattern validation

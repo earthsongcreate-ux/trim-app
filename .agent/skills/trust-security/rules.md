@@ -1,0 +1,3 @@
+- Never obscure sensitive actions
+- Always explain why data is needed
+- Maintain clarity over cleverness

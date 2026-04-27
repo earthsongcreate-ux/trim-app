@@ -1,0 +1,25 @@
+{
+  "app_name": "Trim",
+  "type": "AI Financial Optimization App",
+  "platforms": {
+    "ios": "Swift + SwiftUI",
+    "android": "Kotlin + Jetpack Compose"
+  },
+  "backend": {
+    "language": "Python",
+    "framework_options": ["FastAPI", "Django"]
+  },
+  "ai_ml": ["TensorFlow", "PyTorch"],
+  "database": ["PostgreSQL", "MongoDB"],
+  "cloud": ["AWS", "GCP", "Azure"],
+  "integrations": {
+    "financial_data": "Plaid",
+    "notifications": "Firebase"
+  },
+  "features": [
+    "subscription_discovery",
+    "bill_negotiation",
+    "behavioral_coaching",
+    "freelancer_mode"
+  ]
+}
