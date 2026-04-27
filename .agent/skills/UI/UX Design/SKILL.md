@@ -21,7 +21,7 @@ Color System
 --color-surface: #1E293B;           /* Elevated cards */
 --color-surface-glass: rgba(30, 41, 59, 0.7);
 
---color-accent-primary: #22C55E;    /* Success / growth */
+--color-accent-primary: #6ec499;    /* Success / growth */
 --color-accent-secondary: #3B82F6;  /* Informational */
 
 --color-text-primary: #FFFFFF;

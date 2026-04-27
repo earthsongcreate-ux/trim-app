@@ -11,7 +11,7 @@ module.exports = {
         background: "#0F172A",
         foreground: "#F8FAFC",
         trim: {
-          green: "#4ADE80", // Muted neon green
+          green: "#6ec499", // Refined premium green
           slate: "#1E293B",
           dark: "#0F172A",
         },
@@ -26,8 +26,8 @@ module.exports = {
       },
       keyframes: {
         glow: {
-          "0%": { boxShadow: "0 0 5px rgba(74, 222, 128, 0.2)" },
-          "100%": { boxShadow: "0 0 20px rgba(74, 222, 128, 0.6)" },
+          "0%": { boxShadow: "0 0 10px rgba(110, 196, 153, 0.15)" },
+          "100%": { boxShadow: "0 0 25px rgba(110, 196, 153, 0.3)" },
         },
       },
     },

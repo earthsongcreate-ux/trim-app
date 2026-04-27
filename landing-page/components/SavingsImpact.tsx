@@ -53,7 +53,7 @@ export default function SavingsImpact() {
               initial={{ strokeDashoffset: 283 }}
               whileInView={{ strokeDashoffset: 283 - (283 * 0.68) }}
               transition={{ duration: 2, ease: "easeOut" }}
-              className="text-trim-green drop-shadow-[0_0_8px_rgba(74,222,128,0.5)]"
+              className="text-trim-green drop-shadow-[0_0_12px_rgba(110,196,153,0.3)]"
               strokeLinecap="round"
             />
           </svg>

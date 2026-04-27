@@ -2,6 +2,7 @@
 
 import React from "react";
 import Image from "next/image";
+import Link from "next/link";
 import { ChevronRight } from "lucide-react";
 import { motion } from "framer-motion";
 import DeviceButtons from "./DeviceButtons";
@@ -28,10 +29,15 @@ export default function Hero() {
           
           <DeviceButtons />
 
-          <button className="flex items-center gap-2 mt-10 text-trim-green font-medium group">
-            See how it works
+          <Link 
+            href="#how-it-works" 
+            className="inline-flex items-center gap-2 mt-10 text-trim-green font-medium group hover:text-white transition-all duration-300"
+          >
+            <span className="group-hover:drop-shadow-[0_0_12px_rgba(110,196,153,0.25)] transition-all">
+              See how it works
+            </span>
             <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-          </button>
+          </Link>
         </motion.div>
 
         <motion.div 
@@ -40,12 +46,20 @@ export default function Hero() {
           transition={{ duration: 1, ease: "easeOut" }}
           className="relative flex justify-center lg:justify-end"
         >
-          <div className="relative w-full max-w-[500px]">
-             {/* Glow behind phone */}
-            <div className="absolute inset-0 bg-trim-green/20 blur-[80px] rounded-full animate-pulse-slow" />
-            <div className="relative z-10 glass-card p-2 md:p-4 rotate-3 hover:rotate-0 transition-transform duration-500">
+          <motion.div 
+            animate={{ y: [0, -15, 0] }}
+            transition={{ 
+              duration: 6, 
+              repeat: Infinity, 
+              ease: "easeInOut" 
+            }}
+            className="relative w-full max-w-[500px]"
+          >
+             {/* Ambient soft glow behind phone */}
+            <div className="absolute inset-0 bg-trim-green/20 blur-[100px] rounded-full" />
+            <div className="relative z-10 glass-card p-2 md:p-4 rotate-3 hover:rotate-0 transition-all duration-500 hover:shadow-[0_0_50px_rgba(110,196,153,0.2)]">
                <Image 
-                src="/images/hero-mockup.png" 
+                src="/images/hero_mockup.png" 
                 alt="Trim App Dashboard" 
                 width={500} 
                 height={1000}
@@ -53,7 +67,7 @@ export default function Hero() {
                 priority
               />
             </div>
-          </div>
+          </motion.div>
         </motion.div>
       </div>
     </section>

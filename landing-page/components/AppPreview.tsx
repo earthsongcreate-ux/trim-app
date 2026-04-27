@@ -5,37 +5,47 @@ import Image from "next/image";
 import { motion } from "framer-motion";
 
 const screens = [
-  { title: "Dashboard", img: "/images/preview-1.png" },
-  { title: "Insights", img: "/images/preview-2.png" },
-  { title: "Savings", img: "/images/hero-mockup.png" },
+  { title: "Dashboard", img: "/images/preview_1.png" },
+  { title: "Insights", img: "/images/preview_2.png" },
+  { title: "Savings", img: "/images/hero_mockup.png" },
 ];
 
 export default function AppPreview() {
   return (
     <section className="py-24 bg-background overflow-hidden">
-      <div className="max-w-7xl mx-auto px-6 md:px-12 mb-12">
-        <h2 className="text-3xl md:text-5xl font-bold">Experience the future of finance.</h2>
+      <div className="max-w-7xl mx-auto px-6 md:px-12 mb-16 text-center">
+        <motion.h2 
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          className="text-3xl md:text-5xl font-bold"
+        >
+          Experience the future of finance.
+        </motion.h2>
       </div>
 
-      <div className="flex overflow-x-auto pb-12 gap-8 px-6 md:px-12 no-scrollbar">
+      <div className="max-w-7xl mx-auto px-6 md:px-12 flex flex-wrap justify-center gap-8 md:gap-12">
         {screens.map((screen, idx) => (
           <motion.div 
             key={idx}
-            initial={{ opacity: 0, x: 50 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            transition={{ delay: idx * 0.2 }}
-            className="flex-none w-[280px] md:w-[350px]"
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ delay: idx * 0.1, duration: 0.6 }}
+            whileHover={{ y: -10 }}
+            className="w-full sm:w-[300px] md:w-[340px]"
           >
-            <div className="glass-card p-3 md:p-5 mb-4 group overflow-hidden">
-              <Image 
-                src={screen.img} 
-                alt={screen.title} 
-                width={350} 
-                height={700}
-                className="rounded-xl group-hover:scale-105 transition-transform duration-500"
-              />
+            <div className="glass-card p-2 md:p-3 mb-6 group relative overflow-hidden transition-all duration-500 hover:shadow-[0_0_40px_rgba(110,196,153,0.15)] hover:border-trim-green/30">
+              <div className="aspect-[9/18] relative overflow-hidden rounded-xl bg-white/5">
+                <Image 
+                  src={screen.img} 
+                  alt={screen.title} 
+                  fill
+                  className="object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
+                />
+              </div>
             </div>
-            <h3 className="text-xl font-bold px-2">{screen.title}</h3>
+            <h3 className="text-xl font-bold text-center text-gray-200 group-hover:text-white transition-colors">{screen.title}</h3>
           </motion.div>
         ))}
       </div>

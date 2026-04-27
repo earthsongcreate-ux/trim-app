@@ -11,8 +11,8 @@ export default function Home() {
     <main>
       <Navbar />
       <Hero />
-      <div id="how-it-works">
-        {/* Simple 3-step guide can be integrated here or as its own component */}
+      <div id="how-it-works" className="scroll-mt-32">
+        {/* Simple 3-step guide */}
         <section className="py-24 px-6 md:px-12 bg-trim-dark/50">
           <div className="max-w-7xl mx-auto">
             <h2 className="text-center text-3xl md:text-5xl font-bold mb-16">How it works</h2>

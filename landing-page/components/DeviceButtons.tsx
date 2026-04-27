@@ -16,22 +16,22 @@ export default function DeviceButtons() {
   }, []);
 
   return (
-    <div className="flex flex-col sm:flex-row gap-4">
+    <div className="flex flex-col sm:flex-row items-center gap-4">
       {(device === "ios" || device === "desktop") && (
-        <button className="flex items-center justify-center gap-2 px-8 py-4 bg-white text-background rounded-2xl font-bold hover:scale-105 transition-transform">
-          <Apple className="w-6 h-6 fill-current" />
+        <button className="flex items-center justify-center gap-3 h-16 px-8 bg-white/5 border-2 border-white/20 rounded-2xl font-bold hover:bg-white/10 hover:border-white/30 transition-all duration-300 min-w-[200px] group">
+          <Apple className="w-7 h-7 fill-white text-white group-hover:scale-110 transition-transform" />
           <div className="text-left">
-            <p className="text-[10px] uppercase leading-none opacity-70">Download on the</p>
-            <p className="text-lg leading-tight">App Store</p>
+            <p className="text-[10px] uppercase tracking-[0.1em] leading-none text-gray-400 mb-1">Download on the</p>
+            <p className="text-lg leading-tight text-white font-semibold">App Store</p>
           </div>
         </button>
       )}
       {(device === "android" || device === "desktop") && (
-        <button className={`flex items-center justify-center gap-2 px-8 py-4 rounded-2xl font-bold transition-all ${device === 'android' ? 'bg-white text-background' : 'bg-background border border-white/10 hover:bg-white/5'}`}>
-          <PlayCircle className="w-6 h-6" />
+        <button className="flex items-center justify-center gap-3 h-16 px-8 bg-white/5 border-2 border-white/20 rounded-2xl font-bold hover:bg-white/10 hover:border-white/30 transition-all duration-300 min-w-[200px] group">
+          <PlayCircle className="w-7 h-7 text-white fill-white/10 group-hover:scale-110 transition-transform" />
           <div className="text-left">
-            <p className="text-[10px] uppercase leading-none opacity-70">Get it on</p>
-            <p className="text-lg leading-tight">Google Play</p>
+            <p className="text-[10px] uppercase tracking-[0.1em] leading-none text-gray-400 mb-1">Get it on</p>
+            <p className="text-lg leading-tight text-white font-semibold">Google Play</p>
           </div>
         </button>
       )}
