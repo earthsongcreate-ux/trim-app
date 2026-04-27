@@ -7,6 +7,10 @@ const inter = Inter({ subsets: ["latin"] });
 export const metadata: Metadata = {
   title: "Trim — Stop Wasting Money on Subscriptions",
   description: "Find and cancel hidden subscriptions. Save money instantly with Trim.",
+  icons: {
+    icon: "/favicon.png",
+    apple: "/favicon.png",
+  },
 };
 
 export default function RootLayout({

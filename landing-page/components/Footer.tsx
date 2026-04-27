@@ -9,11 +9,12 @@ export default function Footer() {
     <footer className="bg-background pt-20 pb-10 px-6 md:px-12 border-t border-white/5">
       <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-12 mb-16">
         <div className="col-span-1 md:col-span-2">
-          <Link href="/" className="flex items-center gap-2 mb-6">
-            <div className="w-8 h-8 bg-trim-green rounded-lg flex items-center justify-center">
-              <Zap className="text-background w-5 h-5 fill-current" />
-            </div>
-            <span className="text-xl font-bold">Trim</span>
+          <Link href="/" className="flex items-center gap-3 mb-6">
+            <img 
+              src="/logo.png" 
+              alt="Trim Logo" 
+              className="h-8 w-auto object-contain"
+            />
           </Link>
           <p className="text-gray-400 max-w-sm mb-6">
             The world's first AI-powered subscription manager and automated savings engine.
