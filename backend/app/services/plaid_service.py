@@ -29,7 +29,7 @@ configuration = plaid.Configuration(
 api_client = plaid.ApiClient(configuration)
 client = plaid_api.PlaidApi(api_client)
 
-def create_link_token() -> str:
+def create_link_token(client_user_id: str) -> str:
     """
     Generate a Plaid link_token for frontend initialization.
     """
@@ -39,7 +39,7 @@ def create_link_token() -> str:
         country_codes=[CountryCode("US")],
         language="en",
         user=LinkTokenCreateRequestUser(
-            client_user_id="test-user"
+            client_user_id=client_user_id
         )
     )
     
