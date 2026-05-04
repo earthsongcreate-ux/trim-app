@@ -9,7 +9,7 @@ export default function Navbar() {
     <nav className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-6 py-4 md:px-12 glass border-none bg-background/50 backdrop-blur-md">
       <Link href="/" className="flex items-center gap-3">
         <img 
-          src="/logo.png" 
+          src="/images/logo.png" 
           alt="Trim Logo" 
           className="h-8 w-auto object-contain"
         />
