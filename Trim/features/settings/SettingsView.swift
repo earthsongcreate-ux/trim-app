@@ -1,3 +1,5 @@
+import SwiftUI
+
 struct SettingsView: View {
     @EnvironmentObject var authManager: BiometricAuthManager
     @ObservedObject private var currencyService = CurrencyService.shared

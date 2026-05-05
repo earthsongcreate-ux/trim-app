@@ -111,24 +111,34 @@ struct DashboardView: View {
     
     private func iconName(for type: InsightType) -> String {
         switch type {
-        case .subscriptionIncrease: return "arrow.up.circle.fill"
         case .duplicateCharge: return "exclamationmark.triangle.fill"
-        case .unusualSpending: return "chart.line.uptrend.xyaxis.circle.fill"
+        case .priceIncrease: return "arrow.up.right.circle.fill"
+        case .subscriptionIncrease: return "arrow.up.circle.fill"
+        case .hiddenSubscription: return "magnifyingglass.circle.fill"
         case .savingOpportunity: return "lightbulb.fill"
+        case .unusualSpending: return "chart.line.uptrend.xyaxis.circle.fill"
+        case .incomeVolatility: return "waveform.path.ecg"
+        case .expenseCluster: return "square.grid.2x2.fill"
+        case .opportunityInsight: return "sparkles"
         }
     }
     
     private func colorForType(_ type: InsightType) -> Color {
         switch type {
-        case .subscriptionIncrease: return TrimDesignSystem.Colors.warning
         case .duplicateCharge: return TrimDesignSystem.Colors.error
-        case .unusualSpending: return TrimDesignSystem.Colors.accentSecondary
+        case .priceIncrease: return TrimDesignSystem.Colors.warning
+        case .subscriptionIncrease: return TrimDesignSystem.Colors.warning
+        case .hiddenSubscription: return TrimDesignSystem.Colors.accentSecondary
         case .savingOpportunity: return TrimDesignSystem.Colors.accentPrimary
+        case .unusualSpending: return TrimDesignSystem.Colors.accentSecondary
+        case .incomeVolatility: return TrimDesignSystem.Colors.accentSecondary
+        case .expenseCluster: return TrimDesignSystem.Colors.accentPrimary
+        case .opportunityInsight: return TrimDesignSystem.Colors.accentPrimary
         }
     }
     
     // MARK: - Coaching
-    private func coachingSection(action: CoachingAction) -> some View {
+    private func coachingSection(action: CoachingRecommendation) -> some View {
         GlassCard {
             VStack(alignment: .leading, spacing: 12) {
                 HStack {

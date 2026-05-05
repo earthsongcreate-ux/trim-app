@@ -88,7 +88,15 @@ struct GlassCard<Content: View>: View {
                     .stroke(Color.black.opacity(0.2), lineWidth: 1)
                     .blur(radius: 2)
                     .offset(x: 0, y: 1)
-                    .mask(RoundedRectangle(cornerRadius: TrimDesignSystem.Radius.medium).fill(LinearGradient(Color.clear, Color.black)))
+                    .mask(
+                        RoundedRectangle(cornerRadius: TrimDesignSystem.Radius.medium).fill(
+                            LinearGradient(
+                                gradient: Gradient(colors: [Color.clear, Color.black]),
+                                startPoint: .topLeading,
+                                endPoint: .bottomTrailing
+                            )
+                        )
+                    )
             )
             .cornerRadius(TrimDesignSystem.Radius.medium)
             .shadow(color: Color.black.opacity(0.4), radius: 12, x: 6, y: 6)
@@ -109,14 +117,30 @@ struct NeumorphicInset: ViewModifier {
                     .stroke(Color.black.opacity(0.7), lineWidth: 8)
                     .blur(radius: 6)
                     .offset(x: 6, y: 6)
-                    .mask(RoundedRectangle(cornerRadius: TrimDesignSystem.Radius.medium).fill(LinearGradient(Color.black, Color.clear)))
+                    .mask(
+                        RoundedRectangle(cornerRadius: TrimDesignSystem.Radius.medium).fill(
+                            LinearGradient(
+                                gradient: Gradient(colors: [Color.black, Color.clear]),
+                                startPoint: .topLeading,
+                                endPoint: .bottomTrailing
+                            )
+                        )
+                    )
             )
             .overlay(
                 RoundedRectangle(cornerRadius: TrimDesignSystem.Radius.medium)
                     .stroke(Color.white.opacity(0.08), lineWidth: 2)
                     .blur(radius: 2)
                     .offset(x: -1, y: -1)
-                    .mask(RoundedRectangle(cornerRadius: TrimDesignSystem.Radius.medium).fill(LinearGradient(Color.clear, Color.black)))
+                    .mask(
+                        RoundedRectangle(cornerRadius: TrimDesignSystem.Radius.medium).fill(
+                            LinearGradient(
+                                gradient: Gradient(colors: [Color.clear, Color.black]),
+                                startPoint: .topLeading,
+                                endPoint: .bottomTrailing
+                            )
+                        )
+                    )
             )
     }
 }

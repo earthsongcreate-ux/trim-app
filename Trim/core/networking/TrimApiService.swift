@@ -81,6 +81,16 @@ extension TrimApiService {
             ytdReturn: 0.184
         )
     }
+
+    func fetchSubscriptions() async throws -> [Subscription] {
+        let now = Date()
+        let lastBilled = Calendar.current.date(byAdding: .day, value: -6, to: now) ?? now
+        return [
+            Subscription(id: UUID(), name: "Netflix", amount: 15.49, frequency: "monthly", category: "subscriptions", lastBilled: lastBilled, isUnused: false),
+            Subscription(id: UUID(), name: "Hulu", amount: 12.99, frequency: "monthly", category: "subscriptions", lastBilled: lastBilled, isUnused: true),
+            Subscription(id: UUID(), name: "Spotify", amount: 10.99, frequency: "monthly", category: "subscriptions", lastBilled: lastBilled, isUnused: false),
+        ]
+    }
     
     func createPlaidLinkToken() async throws -> String {
         guard let url = URL(string: "\(baseURL)/api/v1/plaid/create-link-token") else {

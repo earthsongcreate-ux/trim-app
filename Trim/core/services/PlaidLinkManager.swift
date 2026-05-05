@@ -1,5 +1,10 @@
 import Foundation
+#if canImport(Combine)
+import Combine
+#endif
+#if canImport(LinkKit)
 import LinkKit
+#endif
 
 // MARK: - PlaidLinkManager
 
@@ -40,7 +45,9 @@ final class PlaidLinkManager: ObservableObject {
     
     /// The Plaid Link handler — retained during the active session.
     /// Accessible for presentation by `PlaidLinkView`.
+#if canImport(LinkKit)
     private(set) var handler: Handler?
+#endif
     
     /// The public token received from a successful Link session.
     /// Must be sent to the backend immediately for exchange.
@@ -90,6 +97,11 @@ final class PlaidLinkManager: ObservableObject {
         publicToken = nil
         connectedInstitution = nil
         connectedAccountCount = 0
+
+#if !canImport(LinkKit)
+        state = .error("Plaid LinkKit is not installed in this build.")
+        return
+#endif
         
         do {
             let linkToken = try await fetchLinkToken()
@@ -106,7 +118,9 @@ final class PlaidLinkManager: ObservableObject {
     @MainActor
     func reset() {
         state = .idle
+#if canImport(LinkKit)
         handler = nil
+#endif
         publicToken = nil
         connectedInstitution = nil
         connectedAccountCount = 0
@@ -137,6 +151,7 @@ final class PlaidLinkManager: ObservableObject {
     // MARK: - Link Handler Configuration
     
     /// Configures the Plaid Link handler with the provided link_token.
+#if canImport(LinkKit)
     private func configureLinkHandler(with linkToken: String) {
         let configuration = LinkTokenConfiguration(token: linkToken) { [weak self] result in
             self?.handleLinkSuccess(result)
@@ -204,6 +219,13 @@ final class PlaidLinkManager: ObservableObject {
             }
         }
     }
+#else
+    private func configureLinkHandler(with linkToken: String) {
+        DispatchQueue.main.async {
+            self.state = .error("Plaid LinkKit is not installed in this build.")
+        }
+    }
+#endif
     
     // MARK: - Network (Backend Integration)
     

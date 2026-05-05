@@ -1,6 +1,8 @@
 import Foundation
 import Combine
+#if canImport(FirebaseAuth)
 import FirebaseAuth
+#endif
 
 /// Auth tokens payload
 struct AuthTokens {
@@ -25,6 +27,7 @@ final class AuthService: ObservableObject {
     
     /// Verifies if tokens exist in the keychain and attempts to validate/refresh them.
     func checkExistingSession() {
+#if canImport(FirebaseAuth)
         if Auth.auth().currentUser != nil {
             // User is signed in with Firebase. Refresh the token.
             Auth.auth().currentUser?.getIDTokenForcingRefresh(true) { token, error in
@@ -40,6 +43,9 @@ final class AuthService: ObservableObject {
         } else {
             self.isAuthenticated = false
         }
+#else
+        self.isAuthenticated = false
+#endif
     }
     
     // MARK: - Authentication Methods
@@ -64,6 +70,7 @@ final class AuthService: ObservableObject {
     
     func signInWithEmail(email: String, password: String) {
         startAuth()
+#if canImport(FirebaseAuth)
         Auth.auth().signIn(withEmail: email, password: password) { [weak self] authResult, error in
             guard let self = self else { return }
             if let error = error {
@@ -84,10 +91,16 @@ final class AuthService: ObservableObject {
                 }
             }
         }
+#else
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+            self.completeAuth(success: true, tokens: self.mockTokens())
+        }
+#endif
     }
 
     func signUpWithEmail(email: String, password: String) {
         startAuth()
+#if canImport(FirebaseAuth)
         Auth.auth().createUser(withEmail: email, password: password) { [weak self] authResult, error in
             guard let self = self else { return }
             if let error = error {
@@ -108,11 +121,18 @@ final class AuthService: ObservableObject {
                 }
             }
         }
+#else
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+            self.completeAuth(success: true, tokens: self.mockTokens())
+        }
+#endif
     }
     
     func signOut() {
         do {
+#if canImport(FirebaseAuth)
             try Auth.auth().signOut()
+#endif
             try KeychainManager.shared.delete(key: accessTokenKey)
             try KeychainManager.shared.delete(key: refreshTokenKey)
             DispatchQueue.main.async {

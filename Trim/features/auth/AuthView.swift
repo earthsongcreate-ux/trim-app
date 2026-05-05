@@ -55,7 +55,7 @@ struct AuthView: View {
     }
     
     // MARK: - Auth Options
-    private var authOptions: View {
+    private var authOptions: some View {
         VStack(spacing: TrimDesignSystem.Spacing.l) {
             
             if let error = authService.authError {
@@ -120,7 +120,7 @@ struct AuthView: View {
     }
     
     // MARK: - Email Login Form
-    private var emailLoginForm: View {
+    private var emailLoginForm: some View {
         VStack(spacing: TrimDesignSystem.Spacing.l) {
             
             if let error = authService.authError {

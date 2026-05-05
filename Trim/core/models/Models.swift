@@ -205,6 +205,26 @@ struct Transaction: Identifiable, Codable {
             confidence: confidence
         )
     }
+
+    func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(id, forKey: .id)
+        try container.encode(date, forKey: .date)
+        try container.encode(amountConverted, forKey: .amount)
+        try container.encode(merchant, forKey: .merchant)
+        try container.encode(merchant, forKey: .merchantName)
+        try container.encode(category, forKey: .category)
+        try container.encode(isRecurring, forKey: .isRecurring)
+        try container.encode(confidence, forKey: .confidence)
+        try container.encode(amountOriginal, forKey: .amountOriginal)
+        try container.encode(currencyOriginal, forKey: .currencyOriginal)
+        try container.encode(amountConverted, forKey: .amountConverted)
+        try container.encode(currencyBase, forKey: .currencyBase)
+        try container.encode(exchangeRateAtTime, forKey: .exchangeRateAtTime)
+        try container.encodeIfPresent(merchantRaw, forKey: .merchantRaw)
+        try container.encodeIfPresent(recurringInterval, forKey: .recurringInterval)
+        try container.encodeIfPresent(confidenceScores, forKey: .confidenceScores)
+    }
     
     private enum CodingKeys: String, CodingKey {
         case id, date, amount, merchant, merchantName, category, isRecurring, confidence
@@ -487,7 +507,7 @@ enum FeedbackState: Equatable {
 
 // MARK: - Coaching Models
 
-struct CoachingAction: Codable, Identifiable, Equatable {
+struct CoachingRecommendation: Codable, Identifiable, Equatable {
     var id: String {
         return "\(type)_\(title)"
     }
@@ -496,22 +516,22 @@ struct CoachingAction: Codable, Identifiable, Equatable {
     let description: String
     let impact: String // "high", "medium", "low"
     let confidence: String // "high", "medium"
-    let actionData: CoachingActionData?
+    let actionData: CoachingRecommendationData?
     
-    static func == (lhs: CoachingAction, rhs: CoachingAction) -> Bool {
+    static func == (lhs: CoachingRecommendation, rhs: CoachingRecommendation) -> Bool {
         return lhs.id == rhs.id
     }
 }
 
-struct CoachingActionData: Codable, Equatable {
+struct CoachingRecommendationData: Codable, Equatable {
     let insightId: String?
     let merchant: String?
     let type: String?
 }
 
 struct CoachingData: Codable {
-    let priorityAction: CoachingAction?
-    let secondaryActions: [CoachingAction]
+    let priorityAction: CoachingRecommendation?
+    let secondaryActions: [CoachingRecommendation]
     
     enum CodingKeys: String, CodingKey {
         case priorityAction = "priority_action"

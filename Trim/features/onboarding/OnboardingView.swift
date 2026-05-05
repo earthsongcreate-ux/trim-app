@@ -43,7 +43,7 @@ struct OnboardingView: View {
     }
     
     // MARK: - 1. Intro Step
-    private var introStep: View {
+    private var introStep: some View {
         VStack(spacing: TrimDesignSystem.Spacing.xl) {
             Spacer()
             
@@ -84,7 +84,7 @@ struct OnboardingView: View {
     }
     
     // MARK: - 2. Personalization Step
-    private var personalizationStep: View {
+    private var personalizationStep: some View {
         VStack(spacing: TrimDesignSystem.Spacing.l) {
             Spacer()
             
@@ -125,7 +125,7 @@ struct OnboardingView: View {
     }
     
     // MARK: - 3. Bank Connection Step
-    private var bankConnectionStep: View {
+    private var bankConnectionStep: some View {
         VStack(spacing: TrimDesignSystem.Spacing.xl) {
             Spacer()
             
@@ -181,7 +181,7 @@ struct OnboardingView: View {
     }
     
     // MARK: - 4. Live Scan Step
-    private var liveScanStep: View {
+    private var liveScanStep: some View {
         VStack(spacing: TrimDesignSystem.Spacing.xl) {
             Spacer()
             
@@ -225,14 +225,14 @@ struct OnboardingView: View {
                     .stroke(Color.black.opacity(0.7), lineWidth: 8)
                     .blur(radius: 6)
                     .offset(x: 6, y: 6)
-                    .mask(RoundedRectangle(cornerRadius: 100).fill(LinearGradient(Color.black, Color.clear)))
+                    .mask(RoundedRectangle(cornerRadius: 100).fill(LinearGradient(gradient: Gradient(colors: [Color.black, Color.clear]), startPoint: .topLeading, endPoint: .bottomTrailing)))
             )
             .overlay(
                 RoundedRectangle(cornerRadius: 100)
                     .stroke(Color.white.opacity(0.08), lineWidth: 2)
                     .blur(radius: 2)
                     .offset(x: -1, y: -1)
-                    .mask(RoundedRectangle(cornerRadius: 100).fill(LinearGradient(Color.clear, Color.black)))
+                    .mask(RoundedRectangle(cornerRadius: 100).fill(LinearGradient(gradient: Gradient(colors: [Color.clear, Color.black]), startPoint: .topLeading, endPoint: .bottomTrailing)))
             )
             
             Text("Analyzing 3,241 transactions...")
@@ -259,7 +259,7 @@ struct OnboardingView: View {
     }
     
     // MARK: - 5. Insight Step
-    private var insightStep: View {
+    private var insightStep: some View {
         VStack(spacing: TrimDesignSystem.Spacing.xl) {
             Spacer()
             
@@ -304,16 +304,16 @@ struct OnboardingView: View {
     }
     
     // MARK: - 6. Paywall Step
-    private var paywallStep: View {
+    private var paywallStep: some View {
         // Integrate with the actual PaywallView
         PaywallView(
             paywallData: PaywallData(
                 type: "soft",
-                trigger: "onboarding",
+                triggerReason: "onboarding",
                 content: PaywallContent(
                     headline: "Unlock Trim IQ",
                     subtext: "Let us cancel those 4 unused subscriptions and negotiate your bills automatically.",
-                    pricing: PricingOptions(monthly: 7.99, annual: 69.99),
+                    pricing: PaywallPricing(monthly: 7.99, annual: 69.99, trialDays: 3),
                     primaryCta: "Start 3-Day Free Trial",
                     secondaryCta: "Maybe Later"
                 )

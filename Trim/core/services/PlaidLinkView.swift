@@ -1,5 +1,7 @@
 import SwiftUI
+#if canImport(LinkKit)
 import LinkKit
+#endif
 
 // MARK: - PlaidLinkView
 
@@ -19,6 +21,7 @@ import LinkKit
 ///
 /// **Important:** This view is presentation-only. All result handling is managed
 /// by `PlaidLinkManager` via its callback system.
+#if canImport(LinkKit)
 struct PlaidLinkView: UIViewControllerRepresentable {
     
     @EnvironmentObject private var plaidManager: PlaidLinkManager
@@ -53,3 +56,17 @@ struct PlaidLinkView: UIViewControllerRepresentable {
         return plaidManager.handler
     }
 }
+#else
+struct PlaidLinkView: View {
+    var body: some View {
+        VStack(spacing: 12) {
+            Text("Plaid LinkKit not installed")
+                .font(.headline)
+            Text("This build can’t show the bank-connection flow.")
+                .font(.subheadline)
+                .foregroundStyle(.secondary)
+        }
+        .padding()
+    }
+}
+#endif

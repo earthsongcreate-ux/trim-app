@@ -129,8 +129,8 @@ class FreelancerEngine {
             description: insight.message,
             monthlyImpact: 0,
             annualImpact: 0,
-            confidence: insight.confidence,
-            primaryAction: globalAction
+            primaryAction: globalAction,
+            confidence: insight.confidence
         )
     }
 }

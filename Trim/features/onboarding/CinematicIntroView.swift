@@ -115,14 +115,30 @@ struct CinematicIntroView: View {
                                     .stroke(Color.black.opacity(0.7), lineWidth: 8)
                                     .blur(radius: 6)
                                     .offset(x: 6, y: 6)
-                                    .mask(RoundedRectangle(cornerRadius: 120).fill(LinearGradient(Color.black, Color.clear)))
+                                    .mask(
+                                        RoundedRectangle(cornerRadius: 120).fill(
+                                            LinearGradient(
+                                                colors: [Color.black, Color.clear],
+                                                startPoint: .bottomTrailing,
+                                                endPoint: .topLeading
+                                            )
+                                        )
+                                    )
                             )
                             .overlay(
                                 RoundedRectangle(cornerRadius: 120)
                                     .stroke(Color.white.opacity(0.08), lineWidth: 2)
                                     .blur(radius: 2)
                                     .offset(x: -1, y: -1)
-                                    .mask(RoundedRectangle(cornerRadius: 120).fill(LinearGradient(Color.clear, Color.black)))
+                                    .mask(
+                                        RoundedRectangle(cornerRadius: 120).fill(
+                                            LinearGradient(
+                                                colors: [Color.clear, Color.black],
+                                                startPoint: .bottomTrailing,
+                                                endPoint: .topLeading
+                                            )
+                                        )
+                                    )
                             )
                             
                             if phase == .result || phase == .cta {
