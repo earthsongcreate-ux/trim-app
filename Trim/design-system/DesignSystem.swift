@@ -86,8 +86,16 @@ private struct GlassCardStyle: ViewModifier {
         
         return content
             .padding(TrimDesignSystem.Spacing.m)
-            .background(.ultraThinMaterial)
-            .background(TrimDesignSystem.Colors.surface.opacity(0.72))
+            .background(
+                LinearGradient(
+                    colors: [
+                        TrimDesignSystem.Colors.surface.opacity(0.92),
+                        TrimDesignSystem.Colors.surface.opacity(0.72)
+                    ],
+                    startPoint: .topLeading,
+                    endPoint: .bottomTrailing
+                )
+            )
             .clipShape(shape)
             .overlay(
                 shape.stroke(Color.white.opacity(0.1), lineWidth: 1)
@@ -107,8 +115,8 @@ private struct GlassCardStyle: ViewModifier {
                         )
                     )
             )
-            .shadow(color: Color.black.opacity(0.55), radius: 18, x: 0, y: 12)
-            .shadow(color: Color.black.opacity(0.25), radius: 10, x: 0, y: 4)
+            .shadow(color: Color.black.opacity(0.7), radius: 20, x: 0, y: 14)
+            .shadow(color: Color.black.opacity(0.25), radius: 12, x: 0, y: 5)
             .shadow(color: Color.white.opacity(0.05), radius: 1, x: -1, y: -1)
     }
 }

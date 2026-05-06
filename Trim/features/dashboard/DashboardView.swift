@@ -9,17 +9,17 @@ struct DashboardView: View {
     @State private var savingsImpact: SavingsImpact?
     
     @State private var selectedTab: String = "DASHBOARD"
+    @State private var lowerCardsMaxHeight: CGFloat = 0
     
     var body: some View {
         ZStack {
-            TrimDesignSystem.Colors.background.ignoresSafeArea()
-            RadialGradient(gradient: Gradient(colors: [Color.white.opacity(0.03), Color.clear]), center: .center, startRadius: 0, endRadius: 500)
-                .ignoresSafeArea()
+            dashboardBackground
             
             VStack(spacing: 0) {
                 header
                     .padding(.horizontal)
-                    .padding(.top, 10)
+                    .padding(.top, 14)
+                    .padding(.bottom, 8)
                 
                 if selectedTab == "DASHBOARD" {
                     dashboardContent
@@ -70,7 +70,19 @@ struct DashboardView: View {
                 
                 HStack(alignment: .top, spacing: 16) {
                     assetAllocationSection
+                        .background(measureLowerCardHeight(id: "assetAllocation"))
+                        .frame(maxWidth: .infinity, alignment: .topLeading)
+                        .frame(height: lowerCardsMaxHeight == 0 ? nil : lowerCardsMaxHeight, alignment: .top)
                     upcomingBillsSection
+                        .background(measureLowerCardHeight(id: "upcomingBills"))
+                        .frame(maxWidth: .infinity, alignment: .topLeading)
+                        .frame(height: lowerCardsMaxHeight == 0 ? nil : lowerCardsMaxHeight, alignment: .top)
+                }
+                .onPreferenceChange(LowerCardHeightsPreferenceKey.self) { heights in
+                    let maxHeight = heights.values.max() ?? 0
+                    if maxHeight > 0, abs(maxHeight - lowerCardsMaxHeight) > 0.5 {
+                        lowerCardsMaxHeight = maxHeight
+                    }
                 }
             }
             .padding()
@@ -263,35 +275,60 @@ struct DashboardView: View {
     
     // MARK: - Header
     private var header: some View {
-        HStack {
-            HStack(spacing: 8) {
-                Image("logo")
-                    .resizable()
-                    .scaledToFit()
-                    .frame(height: 28)
+        HStack(spacing: 12) {
+            HStack(spacing: 10) {
+                RoundedRectangle(cornerRadius: 7, style: .continuous)
+                    .fill(
+                        LinearGradient(
+                            colors: [
+                                TrimDesignSystem.Colors.accentPrimary.opacity(0.95),
+                                TrimDesignSystem.Colors.accentSecondary.opacity(0.9)
+                            ],
+                            startPoint: .topLeading,
+                            endPoint: .bottomTrailing
+                        )
+                    )
+                    .frame(width: 26, height: 26)
+                    .shadow(color: TrimDesignSystem.Colors.glowPrimary.opacity(0.9), radius: 10, x: 0, y: 6)
+                
+                Text("TRIM")
+                    .font(.system(size: 16, weight: .black, design: .rounded))
+                    .foregroundColor(.white)
+                    .kerning(1)
             }
-            .foregroundColor(.white)
             
             Spacer()
             
-            HStack(spacing: 16) {
+            HStack(spacing: 12) {
                 Image(systemName: "bell")
+                    .font(.system(size: 14, weight: .semibold))
+                    .foregroundColor(.white)
+                    .frame(width: 34, height: 34)
+                    .background(.ultraThinMaterial)
+                    .background(TrimDesignSystem.Colors.surface.opacity(0.55))
+                    .clipShape(Circle())
+                    .overlay(
+                        Circle().stroke(Color.white.opacity(0.12), lineWidth: 1)
+                    )
                     .overlay(
                         Circle()
                             .fill(Color.red)
-                            .frame(width: 8, height: 8)
-                            .offset(x: 5, y: -5),
-                        alignment: .topTrailing
+                            .frame(width: 7, height: 7)
+                            .offset(x: 11, y: -11),
+                        alignment: .center
                     )
                 
                 Text("J.A.")
-                    .font(.caption)
-                    .fontWeight(.bold)
-                    .padding(8)
-                    .background(Color.white.opacity(0.1))
+                    .font(.system(size: 12, weight: .bold, design: .rounded))
+                    .foregroundColor(.white)
+                    .frame(width: 34, height: 34)
+                    .background(.ultraThinMaterial)
+                    .background(TrimDesignSystem.Colors.surface.opacity(0.55))
                     .clipShape(Circle())
+                    .overlay(
+                        Circle().stroke(Color.white.opacity(0.12), lineWidth: 1)
+                    )
             }
-            .foregroundColor(.white)
         }
     }
     
@@ -300,10 +337,10 @@ struct DashboardView: View {
         GlassCard {
             VStack(alignment: .leading, spacing: 16) {
                 Text("Portfolio Performance")
-                    .font(.headline)
+                    .font(.system(size: 16, weight: .bold, design: .rounded))
                     .foregroundColor(.white)
                 
-                HStack(spacing: 24) {
+                HStack(alignment: .center, spacing: 20) {
                     VStack(spacing: 20) {
                         SmallRadialProgress(title: "Cash Flow", progress: 0.74, color: TrimDesignSystem.Colors.accentPrimary)
                         SmallRadialProgress(title: "Debt Ratio", progress: 0.33, color: TrimDesignSystem.Colors.accentPrimary)
@@ -312,6 +349,8 @@ struct DashboardView: View {
                     Spacer(minLength: 0)
                     
                     MainRadialProgress(progress: 0.74, returnPercentage: "+18.4%", balance: "$58,410")
+                        .layoutPriority(1)
+                        .fixedSize()
                 }
             }
         }
@@ -322,9 +361,8 @@ struct DashboardView: View {
         GlassCard {
             VStack(alignment: .leading, spacing: 12) {
                 Text("Asset Allocation")
-                    .font(.subheadline)
-                    .fontWeight(.semibold)
-                    .foregroundColor(.white)
+                    .font(.system(size: 14, weight: .bold, design: .rounded))
+                    .foregroundColor(TrimDesignSystem.Colors.textPrimary)
                 
                 AllocationBar(title: "STOCKS", progress: 0.8, color: TrimDesignSystem.Colors.accentPrimary)
                 AllocationBar(title: "BONDS", progress: 0.6, color: TrimDesignSystem.Colors.accentPrimary)
@@ -338,10 +376,18 @@ struct DashboardView: View {
     private var upcomingBillsSection: some View {
         GlassCard {
             VStack(alignment: .leading, spacing: 12) {
-                Text("Upcoming Bills")
-                    .font(.subheadline)
-                    .fontWeight(.semibold)
-                    .foregroundColor(.white)
+                HStack {
+                    Text("Upcoming Bills")
+                        .font(.system(size: 14, weight: .bold, design: .rounded))
+                        .foregroundColor(TrimDesignSystem.Colors.textPrimary)
+                    
+                    Spacer()
+                    
+                    Circle()
+                        .fill(TrimDesignSystem.Colors.accentPrimary)
+                        .frame(width: 8, height: 8)
+                        .shadow(color: TrimDesignSystem.Colors.accentPrimary.opacity(0.6), radius: 10, x: 0, y: 0)
+                }
                 
                 BillRow(title: "MORTGAGE", date: "15th", status: .paid)
                 BillRow(title: "PETITIONS", date: "22th", status: .pending)
@@ -368,13 +414,58 @@ struct DashboardView: View {
         .padding(.vertical, 12)
         .padding(.horizontal, 8)
         .background(.ultraThinMaterial)
-        .background(TrimDesignSystem.Colors.surface.opacity(0.82))
-        .overlay(Rectangle().frame(height: 1).foregroundColor(Color.white.opacity(0.12)), alignment: .top)
-        .shadow(color: Color.black.opacity(0.55), radius: 18, x: 0, y: -6)
+        .background(TrimDesignSystem.Colors.surface.opacity(0.9))
+        .overlay(Rectangle().frame(height: 1).foregroundColor(Color.white.opacity(0.14)), alignment: .top)
+        .shadow(color: Color.black.opacity(0.7), radius: 22, x: 0, y: -10)
+    }
+
+    private var dashboardBackground: some View {
+        ZStack {
+            TrimDesignSystem.Colors.background
+                .ignoresSafeArea()
+            
+            LinearGradient(
+                colors: [
+                    TrimDesignSystem.Colors.accentPrimary.opacity(0.18),
+                    TrimDesignSystem.Colors.accentSecondary.opacity(0.10),
+                    Color.clear
+                ],
+                startPoint: .topLeading,
+                endPoint: .center
+            )
+            .ignoresSafeArea()
+            
+            LinearGradient(
+                colors: [
+                    Color.black.opacity(0.55),
+                    Color.clear,
+                    Color.black.opacity(0.7)
+                ],
+                startPoint: .top,
+                endPoint: .bottom
+            )
+            .blendMode(.overlay)
+            .ignoresSafeArea()
+        }
+    }
+    
+    private func measureLowerCardHeight(id: String) -> some View {
+        GeometryReader { geo in
+            Color.clear
+                .preference(key: LowerCardHeightsPreferenceKey.self, value: [id: geo.size.height])
+        }
     }
 }
 
 // MARK: - Subviews
+
+private struct LowerCardHeightsPreferenceKey: PreferenceKey {
+    static var defaultValue: [String: CGFloat] = [:]
+    
+    static func reduce(value: inout [String: CGFloat], nextValue: () -> [String: CGFloat]) {
+        value.merge(nextValue(), uniquingKeysWith: { $1 })
+    }
+}
 
 struct MainRadialProgress: View {
     let progress: CGFloat
@@ -408,6 +499,8 @@ struct MainRadialProgress: View {
                     .font(.system(size: 38, weight: .black, design: .rounded))
                     .monospacedDigit()
                     .foregroundColor(TrimDesignSystem.Colors.textPrimary)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.85)
                 
                 Text("YTD Return")
                     .font(.system(size: 12, weight: .semibold, design: .rounded))
@@ -442,8 +535,8 @@ struct SmallRadialProgress: View {
     var body: some View {
         VStack(spacing: 8) {
             Text(title)
-                .font(TrimDesignSystem.Typography.caption)
-                .foregroundColor(TrimDesignSystem.Colors.textSecondary)
+                .font(.system(size: 12, weight: .semibold, design: .rounded))
+                .foregroundColor(TrimDesignSystem.Colors.textSecondary.opacity(0.95))
                 .kerning(0.5)
             
             ZStack {
@@ -483,22 +576,22 @@ struct AllocationBar: View {
         HStack(spacing: 16) {
             Text(title)
                 .font(TrimDesignSystem.Typography.caption)
-                .foregroundColor(color)
-                .frame(width: 60, alignment: .leading)
+                .foregroundColor(TrimDesignSystem.Colors.textSecondary)
+                .frame(width: 64, alignment: .leading)
                 .kerning(0.5)
             
             GeometryReader { geo in
                 ZStack(alignment: .leading) {
                     RoundedRectangle(cornerRadius: 4)
-                        .fill(Color.black.opacity(0.4))
-                        .shadow(color: Color.black.opacity(0.6), radius: 2, x: 1, y: 1)
-                        .shadow(color: Color.white.opacity(0.05), radius: 1, x: -1, y: -1)
+                        .fill(Color.black.opacity(0.35))
+                        .shadow(color: Color.black.opacity(0.6), radius: 3, x: 0, y: 2)
+                        .shadow(color: Color.white.opacity(0.06), radius: 1, x: 0, y: -1)
                         .frame(height: 8)
                     
                     RoundedRectangle(cornerRadius: 4)
                         .fill(color)
                         .frame(width: geo.size.width * progress, height: 8)
-                        .shadow(color: TrimDesignSystem.Colors.glowPrimary, radius: 2, x: 0, y: 0)
+                        .shadow(color: TrimDesignSystem.Colors.glowPrimary, radius: 8, x: 0, y: 0)
                         .overlay(
                             Rectangle()
                                 .fill(TrimDesignSystem.Colors.edgePrimary)
@@ -551,23 +644,35 @@ struct TabBarItem: View {
     
     var body: some View {
         Button(action: action) {
-            VStack(spacing: 4) {
-                Image(systemName: icon)
-                    .font(.system(size: 20))
-                Text(label)
-                    .font(TrimDesignSystem.Typography.caption)
+            ZStack {
+                if isSelected {
+                    RoundedRectangle(cornerRadius: 14, style: .continuous)
+                        .fill(TrimDesignSystem.Colors.accentPrimary.opacity(0.18))
+                        .blur(radius: 10)
+                        .padding(.horizontal, 10)
+                        .padding(.vertical, 2)
+                }
+                
+                VStack(spacing: 4) {
+                    Image(systemName: icon)
+                        .font(.system(size: 18, weight: .semibold))
+                    Text(label)
+                        .font(.system(size: 10, weight: .semibold, design: .rounded))
+                        .kerning(0.4)
+                }
+                .foregroundColor(isSelected ? TrimDesignSystem.Colors.accentPrimary : TrimDesignSystem.Colors.textSecondary.opacity(0.95))
             }
             .frame(maxWidth: .infinity)
-            .foregroundColor(isSelected ? TrimDesignSystem.Colors.accentPrimary : TrimDesignSystem.Colors.textSecondary)
-            .overlay(
-                isSelected ? 
-                Rectangle()
-                    .fill(TrimDesignSystem.Colors.accentPrimary)
-                    .frame(height: 2)
-                    .offset(y: -25)
-                    .shadow(color: TrimDesignSystem.Colors.accentPrimary, radius: 4)
-                : nil
-            )
+            .padding(.vertical, 6)
+            .overlay(alignment: .top) {
+                if isSelected {
+                    Capsule()
+                        .fill(TrimDesignSystem.Colors.accentPrimary)
+                        .frame(width: 34, height: 3)
+                        .shadow(color: TrimDesignSystem.Colors.accentPrimary.opacity(0.7), radius: 8, x: 0, y: 4)
+                        .offset(y: -6)
+                }
+            }
         }
         .trimPressAnimation()
     }
