@@ -40,7 +40,6 @@ struct SecureView<Content: View>: View {
             } else {
                 content
                     .trackSessionActivity()
-                    .sessionLockIndicator()
                     .transition(SecurityTransition.unlock)
             }
         }

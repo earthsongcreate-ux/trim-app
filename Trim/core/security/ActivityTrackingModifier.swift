@@ -25,7 +25,13 @@ struct ActivityTrackingModifier: ViewModifier {
         content
             .contentShape(Rectangle())
             .simultaneousGesture(
-                DragGesture(minimumDistance: 0)
+                TapGesture()
+                    .onEnded {
+                        sessionManager.resetTimer()
+                    }
+            )
+            .simultaneousGesture(
+                DragGesture(minimumDistance: 10)
                     .onChanged { _ in
                         sessionManager.resetTimer()
                     }

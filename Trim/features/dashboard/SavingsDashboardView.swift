@@ -351,18 +351,14 @@ struct RadialProgressDial: View {
     
     var body: some View {
         ZStack {
-            // Base track (dark inset)
             Circle()
-                .stroke(Color.black.opacity(0.4), style: StrokeStyle(lineWidth: 8, lineCap: .round))
-                .shadow(color: .black.opacity(0.6), radius: 4, x: 2, y: 2)
-                .shadow(color: .white.opacity(0.05), radius: 1, x: -1, y: -1)
+                .stroke(Color.white.opacity(0.08), style: StrokeStyle(lineWidth: 8, lineCap: .round))
             
-            // Active stroke
             Circle()
                 .trim(from: 0, to: progress)
                 .stroke(TrimDesignSystem.Colors.accentPrimary, style: StrokeStyle(lineWidth: 8, lineCap: .round))
                 .rotationEffect(.degrees(-90))
-                .shadow(color: TrimDesignSystem.Colors.glowPrimary, radius: 2, x: 0, y: 0)
+                .shadow(color: TrimDesignSystem.Colors.glowPrimary, radius: 10, x: 0, y: 0)
                 .overlay(
                     Circle()
                         .trim(from: max(0, progress - 0.02), to: progress)
@@ -370,13 +366,12 @@ struct RadialProgressDial: View {
                         .rotationEffect(.degrees(-90))
                 )
             
-            // Inner content
             Image(systemName: "chart.line.uptrend.xyaxis")
                 .foregroundColor(TrimDesignSystem.Colors.accentPrimary)
                 .font(.system(size: 20))
         }
         .padding(8)
-        .trimInset()
+        .trimRecessedCircle()
     }
 }
 

@@ -9,7 +9,7 @@ enum TrimDesignSystem {
         static let glowPrimary = Color(hex: "16A34A").opacity(0.18)
         static let edgePrimary = Color(hex: "16A34A").opacity(0.35)
         static let textPrimary = Color.white
-        static let textSecondary = Color.white.opacity(0.5)
+        static let textSecondary = Color.white.opacity(0.7)
         static let success = Color(hex: "16A34A")
         static let warning = Color(hex: "D97706")
         static let error = Color(hex: "DC2626")
@@ -25,9 +25,9 @@ enum TrimDesignSystem {
     }
     
     enum Radius {
-        static let small: CGFloat = 8
-        static let medium: CGFloat = 8
-        static let large: CGFloat = 8
+        static let small: CGFloat = 10
+        static let medium: CGFloat = 14
+        static let large: CGFloat = 18
     }
     
     enum Typography {
@@ -76,20 +76,29 @@ struct GlassCard<Content: View>: View {
     
     var body: some View {
         content
+            .modifier(GlassCardStyle())
+    }
+}
+
+private struct GlassCardStyle: ViewModifier {
+    func body(content: Content) -> some View {
+        let shape = RoundedRectangle(cornerRadius: TrimDesignSystem.Radius.medium, style: .continuous)
+        
+        return content
             .padding(TrimDesignSystem.Spacing.m)
             .background(.ultraThinMaterial)
-            .background(TrimDesignSystem.Colors.surface.opacity(0.6))
+            .background(TrimDesignSystem.Colors.surface.opacity(0.72))
+            .clipShape(shape)
             .overlay(
-                RoundedRectangle(cornerRadius: TrimDesignSystem.Radius.medium)
-                    .stroke(Color.white.opacity(0.08), lineWidth: 1)
+                shape.stroke(Color.white.opacity(0.1), lineWidth: 1)
             )
-            .overlay( // Inner Shadow for depth
-                RoundedRectangle(cornerRadius: TrimDesignSystem.Radius.medium)
+            .overlay(
+                shape
                     .stroke(Color.black.opacity(0.2), lineWidth: 1)
                     .blur(radius: 2)
                     .offset(x: 0, y: 1)
                     .mask(
-                        RoundedRectangle(cornerRadius: TrimDesignSystem.Radius.medium).fill(
+                        shape.fill(
                             LinearGradient(
                                 gradient: Gradient(colors: [Color.clear, Color.black]),
                                 startPoint: .topLeading,
@@ -98,56 +107,111 @@ struct GlassCard<Content: View>: View {
                         )
                     )
             )
-            .cornerRadius(TrimDesignSystem.Radius.medium)
-            .shadow(color: Color.black.opacity(0.4), radius: 12, x: 6, y: 6)
-            .shadow(color: Color.white.opacity(0.04), radius: 2, x: -1, y: -1)
+            .shadow(color: Color.black.opacity(0.55), radius: 18, x: 0, y: 12)
+            .shadow(color: Color.black.opacity(0.25), radius: 10, x: 0, y: 4)
+            .shadow(color: Color.white.opacity(0.05), radius: 1, x: -1, y: -1)
     }
 }
 
 // MARK: - Neumorphic Depth Modifier
 struct NeumorphicInset: ViewModifier {
+    let cornerRadius: CGFloat
+    
+    init(cornerRadius: CGFloat = TrimDesignSystem.Radius.medium) {
+        self.cornerRadius = cornerRadius
+    }
+    
+    func body(content: Content) -> some View {
+        content
+            .background(TrimDesignSystem.Colors.background.opacity(0.55))
+            .clipShape(RoundedRectangle(cornerRadius: cornerRadius, style: .continuous))
+            .overlay(
+                RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
+                    .stroke(Color.black.opacity(0.75), lineWidth: 10)
+                    .blur(radius: 10)
+                    .offset(x: 6, y: 6)
+                    .mask(
+                        RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
+                            .fill(
+                                LinearGradient(
+                                    gradient: Gradient(colors: [Color.black, Color.clear]),
+                                    startPoint: .topLeading,
+                                    endPoint: .bottomTrailing
+                                )
+                            )
+                    )
+            )
+            .overlay(
+                RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
+                    .stroke(Color.white.opacity(0.1), lineWidth: 6)
+                    .blur(radius: 8)
+                    .offset(x: -4, y: -4)
+                    .mask(
+                        RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
+                            .fill(
+                                LinearGradient(
+                                    gradient: Gradient(colors: [Color.clear, Color.black]),
+                                    startPoint: .topLeading,
+                                    endPoint: .bottomTrailing
+                                )
+                            )
+                    )
+            )
+            .compositingGroup()
+    }
+}
+
+struct RecessedCircle: ViewModifier {
     func body(content: Content) -> some View {
         content
             .background(
-                RadialGradient(gradient: Gradient(colors: [Color.black.opacity(0.3), Color.black.opacity(0.1)]), center: .center, startRadius: 0, endRadius: 100)
+                Circle()
+                    .fill(TrimDesignSystem.Colors.background.opacity(0.55))
             )
-            .cornerRadius(TrimDesignSystem.Radius.medium)
             .overlay(
-                RoundedRectangle(cornerRadius: TrimDesignSystem.Radius.medium)
-                    .stroke(Color.black.opacity(0.7), lineWidth: 8)
-                    .blur(radius: 6)
+                Circle()
+                    .stroke(Color.black.opacity(0.75), lineWidth: 10)
+                    .blur(radius: 10)
                     .offset(x: 6, y: 6)
                     .mask(
-                        RoundedRectangle(cornerRadius: TrimDesignSystem.Radius.medium).fill(
-                            LinearGradient(
-                                gradient: Gradient(colors: [Color.black, Color.clear]),
-                                startPoint: .topLeading,
-                                endPoint: .bottomTrailing
+                        Circle()
+                            .fill(
+                                LinearGradient(
+                                    gradient: Gradient(colors: [Color.black, Color.clear]),
+                                    startPoint: .topLeading,
+                                    endPoint: .bottomTrailing
+                                )
                             )
-                        )
                     )
             )
             .overlay(
-                RoundedRectangle(cornerRadius: TrimDesignSystem.Radius.medium)
-                    .stroke(Color.white.opacity(0.08), lineWidth: 2)
-                    .blur(radius: 2)
-                    .offset(x: -1, y: -1)
+                Circle()
+                    .stroke(Color.white.opacity(0.1), lineWidth: 6)
+                    .blur(radius: 8)
+                    .offset(x: -4, y: -4)
                     .mask(
-                        RoundedRectangle(cornerRadius: TrimDesignSystem.Radius.medium).fill(
-                            LinearGradient(
-                                gradient: Gradient(colors: [Color.clear, Color.black]),
-                                startPoint: .topLeading,
-                                endPoint: .bottomTrailing
+                        Circle()
+                            .fill(
+                                LinearGradient(
+                                    gradient: Gradient(colors: [Color.clear, Color.black]),
+                                    startPoint: .topLeading,
+                                    endPoint: .bottomTrailing
+                                )
                             )
-                        )
                     )
             )
+            .clipShape(Circle())
+            .compositingGroup()
     }
 }
 
 extension View {
-    func trimInset() -> some View {
-        self.modifier(NeumorphicInset())
+    func trimInset(cornerRadius: CGFloat = TrimDesignSystem.Radius.medium) -> some View {
+        self.modifier(NeumorphicInset(cornerRadius: cornerRadius))
+    }
+    
+    func trimRecessedCircle() -> some View {
+        self.modifier(RecessedCircle())
     }
     
     func trimPressAnimation() -> some View {

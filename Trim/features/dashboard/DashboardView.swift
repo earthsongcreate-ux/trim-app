@@ -33,9 +33,10 @@ struct DashboardView: View {
                         .foregroundColor(TrimDesignSystem.Colors.textSecondary)
                     Spacer()
                 }
-                
-                customTabBar
             }
+        }
+        .safeAreaInset(edge: .bottom, spacing: 0) {
+            customTabBar
         }
         .task {
             do {
@@ -296,18 +297,22 @@ struct DashboardView: View {
     
     // MARK: - Portfolio Performance
     private var portfolioPerformanceSection: some View {
-        VStack(alignment: .leading, spacing: 16) {
-            Text("Portfolio Performance")
-                .font(.headline)
-                .foregroundColor(.white)
-            
-            HStack(spacing: 40) {
-                VStack(spacing: 20) {
-                    SmallRadialProgress(title: "Cash Flow", progress: 0.74, color: TrimDesignSystem.Colors.accentPrimary)
-                    SmallRadialProgress(title: "Debt Ratio", progress: 0.33, color: TrimDesignSystem.Colors.accentPrimary)
-                }
+        GlassCard {
+            VStack(alignment: .leading, spacing: 16) {
+                Text("Portfolio Performance")
+                    .font(.headline)
+                    .foregroundColor(.white)
                 
-                MainRadialProgress(progress: 0.74, returnPercentage: "+18.4%", balance: "$58,410")
+                HStack(spacing: 24) {
+                    VStack(spacing: 20) {
+                        SmallRadialProgress(title: "Cash Flow", progress: 0.74, color: TrimDesignSystem.Colors.accentPrimary)
+                        SmallRadialProgress(title: "Debt Ratio", progress: 0.33, color: TrimDesignSystem.Colors.accentPrimary)
+                    }
+                    
+                    Spacer(minLength: 0)
+                    
+                    MainRadialProgress(progress: 0.74, returnPercentage: "+18.4%", balance: "$58,410")
+                }
             }
         }
     }
@@ -361,9 +366,11 @@ struct DashboardView: View {
             TabBarItem(icon: "gearshape", label: "SETTINGS", isSelected: selectedTab == "SETTINGS") { selectedTab = "SETTINGS" }
         }
         .padding(.vertical, 12)
+        .padding(.horizontal, 8)
         .background(.ultraThinMaterial)
-        .background(TrimDesignSystem.Colors.surface.opacity(0.8))
-        .overlay(Rectangle().frame(height: 1).foregroundColor(Color.white.opacity(0.1)), alignment: .top)
+        .background(TrimDesignSystem.Colors.surface.opacity(0.82))
+        .overlay(Rectangle().frame(height: 1).foregroundColor(Color.white.opacity(0.12)), alignment: .top)
+        .shadow(color: Color.black.opacity(0.55), radius: 18, x: 0, y: -6)
     }
 }
 
@@ -376,54 +383,54 @@ struct MainRadialProgress: View {
     
     var body: some View {
         ZStack {
-            // Base track (dark inset)
             Circle()
-                .stroke(Color.black.opacity(0.4), style: StrokeStyle(lineWidth: 12, lineCap: .round))
-                .shadow(color: .black.opacity(0.6), radius: 6, x: 4, y: 4)
-                .shadow(color: .white.opacity(0.05), radius: 2, x: -1, y: -1)
+                .stroke(Color.white.opacity(0.08), style: StrokeStyle(lineWidth: 14, lineCap: .round))
             
-            // Active stroke
             Circle()
                 .trim(from: 0, to: progress)
-                .stroke(TrimDesignSystem.Colors.accentPrimary, style: StrokeStyle(lineWidth: 12, lineCap: .round))
+                .stroke(TrimDesignSystem.Colors.accentPrimary, style: StrokeStyle(lineWidth: 14, lineCap: .round))
                 .rotationEffect(.degrees(-90))
-                .shadow(color: TrimDesignSystem.Colors.glowPrimary, radius: 2, x: 0, y: 0)
+                .shadow(color: TrimDesignSystem.Colors.glowPrimary, radius: 12, x: 0, y: 0)
                 .overlay(
                     Circle()
                         .trim(from: max(0, progress - 0.01), to: progress)
-                        .stroke(TrimDesignSystem.Colors.edgePrimary, style: StrokeStyle(lineWidth: 12, lineCap: .round))
+                        .stroke(TrimDesignSystem.Colors.edgePrimary, style: StrokeStyle(lineWidth: 14, lineCap: .round))
                         .rotationEffect(.degrees(-90))
                 )
             
             VStack(spacing: 4) {
                 Text("\(Int(progress * 100))%")
-                    .font(TrimDesignSystem.Typography.caption)
+                    .font(.system(size: 14, weight: .bold, design: .rounded))
+                    .monospacedDigit()
                     .foregroundColor(TrimDesignSystem.Colors.accentPrimary)
-                    .shadow(color: TrimDesignSystem.Colors.accentPrimary.opacity(0.3), radius: 2, x: 0, y: 1)
                 
                 Text(returnPercentage)
-                    .font(TrimDesignSystem.Typography.header)
+                    .font(.system(size: 38, weight: .black, design: .rounded))
+                    .monospacedDigit()
                     .foregroundColor(TrimDesignSystem.Colors.textPrimary)
-                    .shadow(color: Color.black.opacity(0.5), radius: 4, x: 0, y: 2)
                 
                 Text("YTD Return")
-                    .font(TrimDesignSystem.Typography.caption)
+                    .font(.system(size: 12, weight: .semibold, design: .rounded))
                     .foregroundColor(TrimDesignSystem.Colors.textSecondary)
                     .kerning(0.5)
                 
                 Text(balance)
-                    .font(TrimDesignSystem.Typography.body)
+                    .font(.system(size: 14, weight: .bold, design: .rounded))
+                    .monospacedDigit()
                     .padding(.horizontal, 12)
                     .padding(.vertical, 4)
-                    .background(Color.black.opacity(0.4))
-                    .cornerRadius(20)
+                    .background(TrimDesignSystem.Colors.surface.opacity(0.7))
+                    .clipShape(Capsule())
+                    .overlay(
+                        Capsule()
+                            .stroke(Color.white.opacity(0.12), lineWidth: 1)
+                    )
                     .padding(.top, 10)
-                    .shadow(color: Color.black.opacity(0.5), radius: 4, x: 0, y: 2)
             }
         }
-        .padding(16)
-        .trimInset()
-        .frame(width: 180, height: 180)
+        .padding(18)
+        .trimRecessedCircle()
+        .frame(width: 190, height: 190)
     }
 }
 
@@ -440,33 +447,29 @@ struct SmallRadialProgress: View {
                 .kerning(0.5)
             
             ZStack {
-                // Base track
                 Circle()
-                    .stroke(Color.black.opacity(0.4), style: StrokeStyle(lineWidth: 6, lineCap: .round))
-                    .shadow(color: .black.opacity(0.6), radius: 4, x: 2, y: 2)
-                    .shadow(color: .white.opacity(0.05), radius: 1, x: -1, y: -1)
+                    .stroke(Color.white.opacity(0.08), style: StrokeStyle(lineWidth: 8, lineCap: .round))
                 
-                // Active stroke
                 Circle()
                     .trim(from: 0, to: progress)
-                    .stroke(color, style: StrokeStyle(lineWidth: 6, lineCap: .round))
+                    .stroke(color, style: StrokeStyle(lineWidth: 8, lineCap: .round))
                     .rotationEffect(.degrees(-90))
-                    .shadow(color: TrimDesignSystem.Colors.glowPrimary, radius: 2, x: 0, y: 0)
+                    .shadow(color: TrimDesignSystem.Colors.glowPrimary, radius: 10, x: 0, y: 0)
                     .overlay(
                         Circle()
                             .trim(from: max(0, progress - 0.05), to: progress)
-                            .stroke(TrimDesignSystem.Colors.edgePrimary, style: StrokeStyle(lineWidth: 6, lineCap: .round))
+                            .stroke(TrimDesignSystem.Colors.edgePrimary, style: StrokeStyle(lineWidth: 8, lineCap: .round))
                             .rotationEffect(.degrees(-90))
                     )
                 
                 Text("\(Int(progress * 100))%")
-                    .font(TrimDesignSystem.Typography.body)
+                    .font(.system(size: 14, weight: .bold, design: .rounded))
+                    .monospacedDigit()
                     .foregroundColor(TrimDesignSystem.Colors.textPrimary)
-                    .shadow(color: Color.black.opacity(0.5), radius: 2, x: 0, y: 1)
             }
-            .padding(8)
-            .trimInset()
-            .frame(width: 76, height: 76)
+            .padding(10)
+            .trimRecessedCircle()
+            .frame(width: 84, height: 84)
         }
     }
 }
