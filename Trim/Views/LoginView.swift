@@ -23,7 +23,7 @@ struct LoginView: View {
                 VStack(alignment: .leading, spacing: TrimDesignSystem.Spacing.xl) {
                     header
                     
-                    GlassCard {
+                    PremiumGlassCard(.inset) {
                         VStack(spacing: TrimDesignSystem.Spacing.m) {
                             inputField(
                                 title: "Email",

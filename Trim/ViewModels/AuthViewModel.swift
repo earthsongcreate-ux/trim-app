@@ -5,15 +5,17 @@ import FirebaseAuth
 @MainActor
 final class AuthViewModel: ObservableObject {
     @Published private(set) var user: User?
+    @Published private(set) var profile: UserProfile?
     @Published private(set) var isLoading: Bool = false
     @Published private(set) var isCheckingSession: Bool = true
+    @Published private(set) var isLoadingProfile: Bool = false
     @Published var errorMessage: String?
     
     private let authService: AuthService
     private var authStateHandle: AuthStateDidChangeListenerHandle?
     
-    init(authService: AuthService = .shared) {
-        self.authService = authService
+    init(authService: AuthService? = nil) {
+        self.authService = authService ?? .shared
         start()
     }
     
@@ -35,14 +37,20 @@ final class AuthViewModel: ObservableObject {
         if authStateHandle == nil {
             authStateHandle = authService.addAuthStateDidChangeListener { [weak self] user in
                 Task { @MainActor in
-                    self?.user = user
-                    self?.isCheckingSession = false
+                    self?.handleAuthStateChange(user)
                 }
             }
         }
         
         user = authService.currentUser
-        isCheckingSession = false
+        
+        if let user {
+            Task { @MainActor in
+                await loadUserProfile(for: user, isInitial: true)
+            }
+        } else {
+            isCheckingSession = false
+        }
     }
     
     func signIn(email: String, password: String) async {
@@ -53,7 +61,14 @@ final class AuthViewModel: ObservableObject {
     
     func signUp(email: String, password: String) async {
         await runAuthTask { [self] in
-            _ = try await self.authService.createUser(email: email, password: password)
+            let user = try await self.authService.createUser(email: email, password: password)
+            do {
+                try await UserProfileService.shared.createUserProfileIfNeeded(user: user)
+                self.profile = try await UserProfileService.shared.fetchUserProfile(uid: user.uid)
+            } catch {
+                try? self.authService.signOut()
+                throw AuthFlowError.profileSetupFailed
+            }
         }
     }
     
@@ -67,8 +82,75 @@ final class AuthViewModel: ObservableObject {
         errorMessage = nil
         do {
             try authService.signOut()
+            profile = nil
         } catch {
             errorMessage = "Couldn’t sign out. Please try again."
+        }
+    }
+    
+    func completeOnboarding(firstName: String?, monthlyIncome: Int, monthlySavingsGoal: Int) async {
+        guard let user else { return }
+        guard !isLoadingProfile else { return }
+        
+        isLoadingProfile = true
+        defer { isLoadingProfile = false }
+        
+        do {
+            try await UserProfileService.shared.updateOnboardingInputs(
+                uid: user.uid,
+                firstName: firstName,
+                monthlyIncome: monthlyIncome,
+                monthlySavingsGoal: monthlySavingsGoal
+            )
+            if let current = profile {
+                profile = UserProfile(
+                    uid: current.uid,
+                    email: current.email,
+                    createdAt: current.createdAt,
+                    firstName: firstName ?? current.firstName,
+                    monthlyIncome: monthlyIncome,
+                    monthlySavingsGoal: monthlySavingsGoal,
+                    onboardingComplete: true,
+                    isPremium: current.isPremium,
+                    subscriptionPlan: current.subscriptionPlan,
+                    subscriptionStatus: current.subscriptionStatus,
+                    trialDays: current.trialDays,
+                    trialStartedAt: current.trialStartedAt,
+                    isFoundingMember: current.isFoundingMember,
+                    foundingMemberNumber: current.foundingMemberNumber,
+                    lockedAnnualPriceCents: current.lockedAnnualPriceCents,
+                    lockedAnnualPriceCurrency: current.lockedAnnualPriceCurrency,
+                    hasEarlySupporterBadge: current.hasEarlySupporterBadge,
+                    futurePremiumFeaturesIncluded: current.futurePremiumFeaturesIncluded
+                )
+            } else {
+                profile = try await UserProfileService.shared.fetchUserProfile(uid: user.uid)
+            }
+        } catch {
+            errorMessage = "We couldn’t finish onboarding. Please try again."
+        }
+    }
+
+    func startPremiumTrial(plan: SubscriptionPlan) async -> Bool {
+        guard let user else { return false }
+        guard !isLoadingProfile else { return false }
+        
+        isLoadingProfile = true
+        defer { isLoadingProfile = false }
+        
+        do {
+            try await UserProfileService.shared.startPremiumTrial(
+                uid: user.uid,
+                plan: plan,
+                trialDays: 7,
+                annualPriceCents: 9900,
+                annualCurrency: "USD"
+            )
+            profile = try await UserProfileService.shared.fetchUserProfile(uid: user.uid)
+            return true
+        } catch {
+            errorMessage = "We couldn’t start your trial. Please try again."
+            return false
         }
     }
     
@@ -96,6 +178,10 @@ final class AuthViewModel: ObservableObject {
     }
     
     private func friendlyMessage(for error: Error) -> String {
+        if let error = error as? AuthFlowError, let message = error.errorDescription {
+            return message
+        }
+        
         let nsError = error as NSError
         if let code = AuthErrorCode(rawValue: nsError.code) {
             switch code {
@@ -119,5 +205,52 @@ final class AuthViewModel: ObservableObject {
         }
         
         return "Something went wrong. Please try again."
+    }
+    
+    private func handleAuthStateChange(_ user: User?) {
+        self.user = user
+        if user == nil {
+            profile = nil
+            isCheckingSession = false
+            isLoadingProfile = false
+            return
+        }
+        
+        Task { @MainActor in
+            await loadUserProfile(for: user!, isInitial: false)
+        }
+    }
+    
+    private func loadUserProfile(for user: User, isInitial: Bool) async {
+        if isInitial {
+            isCheckingSession = true
+        }
+        
+        isLoadingProfile = true
+        defer {
+            isLoadingProfile = false
+            if isInitial {
+                isCheckingSession = false
+            }
+        }
+        
+        do {
+            try await UserProfileService.shared.createUserProfileIfNeeded(user: user)
+            profile = try await UserProfileService.shared.fetchUserProfile(uid: user.uid)
+        } catch {
+            profile = nil
+            errorMessage = "We couldn’t load your account details. Please try again."
+        }
+    }
+}
+
+private enum AuthFlowError: LocalizedError {
+    case profileSetupFailed
+    
+    var errorDescription: String? {
+        switch self {
+        case .profileSetupFailed:
+            return "We couldn’t finish setting up your account. Please try again."
+        }
     }
 }

@@ -7,6 +7,12 @@ struct PaywallView: View {
     
     var dynamicSavings: Double = 842.0 // Mocked for dynamic ROI anchor
     
+    @EnvironmentObject private var authViewModel: AuthViewModel
+    @State private var selectedPlan: SubscriptionPlan = .annual
+    @State private var offerState: FoundingAnnualOfferState?
+    @State private var isStartingTrial: Bool = false
+    @State private var localErrorMessage: String?
+    
     var isHardPaywall: Bool {
         return paywallData.type == "hard"
     }
@@ -18,34 +24,108 @@ struct PaywallView: View {
                 .ignoresSafeArea()
             
             VStack(spacing: TrimDesignSystem.Spacing.xl) {
-                
-                // 1. TOP: Savings Anchor
-                VStack(spacing: TrimDesignSystem.Spacing.xs) {
-                    Text("You've already identified")
-                        .font(TrimDesignSystem.Typography.caption)
-                        .foregroundColor(TrimDesignSystem.Colors.textSecondary)
-                        .kerning(1.0)
-                        .textCase(.uppercase)
-                    
-                    Text("$\(Int(dynamicSavings))")
-                        .font(.system(size: 72, weight: .bold))
+                VStack(spacing: TrimDesignSystem.Spacing.s) {
+                    Text(paywallData.content.headline)
+                        .font(TrimDesignSystem.Typography.header)
                         .foregroundColor(TrimDesignSystem.Colors.textPrimary)
-                        .shadow(color: TrimDesignSystem.Colors.glowPrimary, radius: 4, x: 0, y: 0)
+                        .multilineTextAlignment(.center)
                     
-                    Text("in potential annual savings.")
+                    Text(paywallData.content.subtext)
                         .font(TrimDesignSystem.Typography.body)
-                        .foregroundColor(TrimDesignSystem.Colors.accentPrimary)
+                        .foregroundColor(TrimDesignSystem.Colors.textSecondary)
+                        .multilineTextAlignment(.center)
                 }
-                .padding(.top, TrimDesignSystem.Spacing.xl)
+                .padding(.top, TrimDesignSystem.Spacing.l)
+                .padding(.horizontal)
+                
+                PremiumGlassCard(.inset) {
+                    VStack(alignment: .leading, spacing: TrimDesignSystem.Spacing.m) {
+                        timelineRow(
+                            title: "Today",
+                            detail: "$0",
+                            icon: "sparkles"
+                        )
+                        timelineRow(
+                            title: "Day \(max(paywallData.content.pricing.trialDays - 1, 1))",
+                            detail: "Reminder",
+                            icon: "bell"
+                        )
+                        timelineRow(
+                            title: "Day \(paywallData.content.pricing.trialDays)",
+                            detail: "\(formattedMonthly) / month or \(formattedAnnual) / year",
+                            icon: "lock.open"
+                        )
+                        
+                        Text("Cancel anytime in Settings.")
+                            .font(TrimDesignSystem.Typography.caption)
+                            .foregroundColor(TrimDesignSystem.Colors.textSecondary)
+                            .padding(.top, 2)
+                    }
+                }
+                .padding(.horizontal)
+                
+                PremiumGlassCard {
+                    VStack(spacing: TrimDesignSystem.Spacing.xs) {
+                        Text("Savings found")
+                            .font(TrimDesignSystem.Typography.caption)
+                            .foregroundColor(TrimDesignSystem.Colors.textSecondary)
+                            .textCase(.uppercase)
+                            .kerning(1.0)
+                        
+                        Text("$\(Int(dynamicSavings)) / yr")
+                            .font(.system(size: 52, weight: .bold))
+                            .foregroundColor(TrimDesignSystem.Colors.textPrimary)
+                            .shadow(color: TrimDesignSystem.Colors.glowPrimary, radius: 3, x: 0, y: 0)
+                        
+                        Text("based on your scan")
+                            .font(TrimDesignSystem.Typography.body)
+                            .foregroundColor(TrimDesignSystem.Colors.textSecondary)
+                    }
+                }
+                .padding(.horizontal)
                 
                 // 2. VALUE SECTION
-                GlassCard {
+                PremiumGlassCard(.inset) {
                     VStack(alignment: .leading, spacing: TrimDesignSystem.Spacing.l) {
                         valueRow(icon: "scissors", text: "Cancel unused subscriptions")
-                        valueRow(icon: "arrow.down.to.line.alt", text: "Negotiate lower recurring bills")
-                        valueRow(icon: "chart.line.uptrend.xyaxis", text: "Improve financial health")
+                        valueRow(icon: "arrow.down.to.line.alt", text: "Lower recurring bills")
+                        valueRow(icon: "checkmark.shield.fill", text: "Keep your data secure")
                     }
                     .padding(.vertical, TrimDesignSystem.Spacing.s)
+                }
+                .padding(.horizontal)
+                
+                PremiumGlassCard(.inset) {
+                    VStack(alignment: .leading, spacing: TrimDesignSystem.Spacing.m) {
+                        HStack(alignment: .firstTextBaseline) {
+                            Text("Founding Member Bonus")
+                                .font(TrimDesignSystem.Typography.subheader)
+                                .foregroundColor(TrimDesignSystem.Colors.textPrimary)
+                            
+                            Spacer()
+                            
+                            if let offerState, offerState.isAvailable {
+                                Text("\(offerState.remainingCount) left")
+                                    .font(TrimDesignSystem.Typography.caption)
+                                    .foregroundColor(TrimDesignSystem.Colors.accentSecondary)
+                            } else {
+                                Text("First 250")
+                                    .font(TrimDesignSystem.Typography.caption)
+                                    .foregroundColor(TrimDesignSystem.Colors.textSecondary)
+                            }
+                        }
+                        
+                        Text("Annual members only. Limited-time test offer.")
+                            .font(TrimDesignSystem.Typography.caption)
+                            .foregroundColor(TrimDesignSystem.Colors.textSecondary)
+                        
+                        VStack(alignment: .leading, spacing: TrimDesignSystem.Spacing.s) {
+                            valueRow(icon: "lock.fill", text: "Lock $99/year forever")
+                            valueRow(icon: "seal.fill", text: "Early supporter badge")
+                            valueRow(icon: "sparkles", text: "Future premium features included")
+                        }
+                        .padding(.top, 2)
+                    }
                 }
                 .padding(.horizontal)
                 
@@ -55,27 +135,40 @@ struct PaywallView: View {
                 HStack(spacing: TrimDesignSystem.Spacing.m) {
                     pricingCard(
                         title: "Monthly",
-                        price: "$\(paywallData.content.pricing.monthly)",
+                        price: formattedMonthly,
                         period: "/mo",
-                        isHighlighted: false
+                        isHighlighted: selectedPlan == .monthly,
+                        badges: []
                     )
+                    .onTapGesture {
+                        selectedPlan = .monthly
+                    }
                     
                     pricingCard(
                         title: "Annual",
-                        price: "$\(paywallData.content.pricing.annual)",
+                        price: formattedAnnual,
                         period: "/yr",
-                        isHighlighted: true,
-                        badge: "Best Value"
+                        isHighlighted: selectedPlan == .annual,
+                        badges: ["Recommended", annualSavingsBadge]
                     )
+                    .onTapGesture {
+                        selectedPlan = .annual
+                    }
                 }
                 .padding(.horizontal)
                 
                 // 4. CTA
                 VStack(spacing: TrimDesignSystem.Spacing.m) {
                     Button(action: {
-                        onConvert()
+                        startTrial()
                     }) {
-                        Text(paywallData.content.primaryCta)
+                        HStack(spacing: 10) {
+                            if isStartingTrial {
+                                ProgressView()
+                                    .progressViewStyle(CircularProgressViewStyle(tint: TrimDesignSystem.Colors.background))
+                            }
+                            Text(paywallData.content.primaryCta)
+                        }
                             .font(TrimDesignSystem.Typography.subheader)
                             .foregroundColor(TrimDesignSystem.Colors.background)
                             .frame(maxWidth: .infinity)
@@ -84,6 +177,14 @@ struct PaywallView: View {
                             .cornerRadius(TrimDesignSystem.Radius.medium)
                     }
                     .trimPressAnimation()
+                    .disabled(isStartingTrial)
+                    
+                    if let localErrorMessage {
+                        Text(localErrorMessage)
+                            .font(TrimDesignSystem.Typography.caption)
+                            .foregroundColor(TrimDesignSystem.Colors.error)
+                            .multilineTextAlignment(.center)
+                    }
                     
                     if !isHardPaywall, let secondaryText = paywallData.content.secondaryCta {
                         Button(action: {
@@ -101,6 +202,25 @@ struct PaywallView: View {
             }
         }
         .interactiveDismissDisabled(isHardPaywall)
+        .task {
+            await loadOfferState()
+        }
+    }
+    
+    private var formattedMonthly: String {
+        "$" + String(format: "%.2f", paywallData.content.pricing.monthly)
+    }
+    
+    private var formattedAnnual: String {
+        "$" + String(format: "%.2f", paywallData.content.pricing.annual)
+    }
+
+    private var annualSavingsBadge: String {
+        let monthlyAnnual = paywallData.content.pricing.monthly * 12.0
+        guard monthlyAnnual > 0 else { return "Save 0%" }
+        let raw = (1.0 - (paywallData.content.pricing.annual / monthlyAnnual)) * 100.0
+        let percent = max(Int(raw.rounded()), 0)
+        return "Save \(percent)%"
     }
     
     private func valueRow(icon: String, text: String) -> some View {
@@ -115,46 +235,111 @@ struct PaywallView: View {
         }
     }
     
-    @ViewBuilder
-    private func pricingCard(title: String, price: String, period: String, isHighlighted: Bool, badge: String? = nil) -> some View {
-        VStack(spacing: 8) {
-            if let badge = badge {
-                Text(badge)
+    private func timelineRow(title: String, detail: String, icon: String) -> some View {
+        HStack(alignment: .center, spacing: TrimDesignSystem.Spacing.m) {
+            ZStack {
+                Circle()
+                    .fill(TrimDesignSystem.Colors.accentSecondary.opacity(0.12))
+                Image(systemName: icon)
+                    .font(.system(size: 16, weight: .semibold))
+                    .foregroundColor(TrimDesignSystem.Colors.accentSecondary)
+            }
+            .frame(width: 34, height: 34)
+            
+            VStack(alignment: .leading, spacing: 2) {
+                Text(title)
                     .font(TrimDesignSystem.Typography.caption)
-                    .foregroundColor(TrimDesignSystem.Colors.background)
-                    .padding(.horizontal, 8)
-                    .padding(.vertical, 4)
-                    .background(TrimDesignSystem.Colors.accentPrimary)
-                    .cornerRadius(TrimDesignSystem.Radius.medium)
-                    .offset(y: -16)
-                    .padding(.bottom, -16)
+                    .foregroundColor(TrimDesignSystem.Colors.textSecondary)
+                
+                Text(detail)
+                    .font(TrimDesignSystem.Typography.body)
+                    .foregroundColor(TrimDesignSystem.Colors.textPrimary)
             }
             
-            Text(title)
-                .font(TrimDesignSystem.Typography.subheader)
-                .foregroundColor(isHighlighted ? TrimDesignSystem.Colors.textPrimary : TrimDesignSystem.Colors.textSecondary)
-            
-            Text(price)
-                .font(TrimDesignSystem.Typography.header)
-                .foregroundColor(TrimDesignSystem.Colors.textPrimary)
-            
-            Text(period)
-                .font(TrimDesignSystem.Typography.caption)
-                .foregroundColor(TrimDesignSystem.Colors.textSecondary)
+            Spacer()
         }
-        .frame(maxWidth: .infinity)
-        .padding(.vertical, TrimDesignSystem.Spacing.m * 1.5)
-        .background(isHighlighted ? TrimDesignSystem.Colors.accentPrimary.opacity(0.1) : Color.clear)
+    }
+    
+    @ViewBuilder
+    private func pricingCard(title: String, price: String, period: String, isHighlighted: Bool, badges: [String] = []) -> some View {
+        PremiumGlassCard(isHighlighted ? .lifted : .inset, cornerRadius: TrimDesignSystem.Radius.medium, padding: 16) {
+            VStack(spacing: 8) {
+                if !badges.isEmpty {
+                    HStack(spacing: 8) {
+                        ForEach(badges, id: \.self) { badge in
+                            Text(badge)
+                                .font(TrimDesignSystem.Typography.caption)
+                                .foregroundColor(TrimDesignSystem.Colors.background)
+                                .padding(.horizontal, 10)
+                                .padding(.vertical, 5)
+                                .background(TrimDesignSystem.Colors.accentPrimary)
+                                .cornerRadius(TrimDesignSystem.Radius.medium)
+                        }
+                    }
+                }
+                
+                Text(title)
+                    .font(TrimDesignSystem.Typography.subheader)
+                    .foregroundColor(TrimDesignSystem.Colors.textPrimary)
+                
+                HStack(alignment: .firstTextBaseline, spacing: 4) {
+                    Text(price)
+                        .font(TrimDesignSystem.Typography.header)
+                        .foregroundColor(TrimDesignSystem.Colors.textPrimary)
+                    
+                    Text(period)
+                        .font(TrimDesignSystem.Typography.caption)
+                        .foregroundColor(TrimDesignSystem.Colors.textSecondary)
+                        .padding(.top, 6)
+                }
+                
+                if isHighlighted {
+                    Text("Recommended")
+                        .font(TrimDesignSystem.Typography.caption)
+                        .foregroundColor(TrimDesignSystem.Colors.textSecondary)
+                        .padding(.top, 4)
+                } else {
+                    Text("Flexible monthly plan")
+                        .font(TrimDesignSystem.Typography.caption)
+                        .foregroundColor(TrimDesignSystem.Colors.textSecondary)
+                        .padding(.top, 4)
+                }
+            }
+            .frame(maxWidth: .infinity)
+            .padding(.vertical, 6)
+        }
         .overlay(
-            RoundedRectangle(cornerRadius: TrimDesignSystem.Radius.medium)
-                .stroke(isHighlighted ? TrimDesignSystem.Colors.accentPrimary : Color.white.opacity(0.08), lineWidth: isHighlighted ? 2 : 1)
+            RoundedRectangle(cornerRadius: TrimDesignSystem.Radius.medium, style: .continuous)
+                .stroke(
+                    isHighlighted ? TrimDesignSystem.Colors.accentSecondary.opacity(0.45) : Color.white.opacity(0.06),
+                    lineWidth: isHighlighted ? 2 : 1
+                )
         )
-        .cornerRadius(TrimDesignSystem.Radius.medium)
-        .if(isHighlighted) { view in
-            view.background(.ultraThinMaterial)
-                .background(TrimDesignSystem.Colors.surface.opacity(0.6))
-                .shadow(color: Color.black.opacity(0.4), radius: 12, x: 6, y: 6)
-                .shadow(color: Color.white.opacity(0.04), radius: 2, x: -1, y: -1)
+    }
+    
+    private func loadOfferState() async {
+        do {
+            offerState = try await UserProfileService.shared.fetchFoundingAnnualOfferState()
+        } catch {
+            offerState = nil
+        }
+    }
+    
+    private func startTrial() {
+        guard !isStartingTrial else { return }
+        localErrorMessage = nil
+        isStartingTrial = true
+        
+        Task {
+            let ok = await authViewModel.startPremiumTrial(plan: selectedPlan)
+            await MainActor.run {
+                isStartingTrial = false
+                if ok {
+                    onConvert()
+                } else {
+                    localErrorMessage = authViewModel.errorMessage ?? "We couldn’t start your trial. Please try again."
+                }
+            }
         }
     }
 }

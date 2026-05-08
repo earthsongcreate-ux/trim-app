@@ -57,7 +57,7 @@ struct SavingsDashboardView: View {
     
     // MARK: - 2. HERO CARD
     private func heroCard(impact: SavingsImpact) -> some View {
-        GlassCard {
+        PremiumGlassCard {
             HStack {
                 VStack(alignment: .leading, spacing: 8) {
                     Text("TOTAL SAVED")
@@ -141,7 +141,7 @@ struct SavingsDashboardView: View {
                 .font(.headline)
                 .foregroundColor(TrimDesignSystem.Colors.textPrimary)
             
-            GlassCard {
+            PremiumGlassCard(.inset) {
                 VStack(spacing: 0) {
                     ForEach(Array(wins.enumerated()), id: \.element.id) { index, win in
                         SavingsWinRow(win: win, delay: Double(index) * 0.1)

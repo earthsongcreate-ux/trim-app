@@ -7,9 +7,9 @@ const engagementEngine = require('./engagementEngine');
  * Maximize conversion by presenting the paywall at high-intent, high-value moments.
  * 
  * PRICING:
- * - Monthly: $7.99
- * - Annual: $69.99
- * - Free Trial: 3 days
+ * - Monthly: $12.99
+ * - Annual: $99.00
+ * - Free Trial: 7 days
  */
 
 // In-memory store for tracking conversions and triggers
@@ -19,9 +19,9 @@ const conversionStore = new Map();
 class PaywallEngine {
   constructor() {
     this.PRICING = {
-      monthly: 7.99,
-      annual: 69.99,
-      trialDays: 3
+      monthly: 12.99,
+      annual: 99.0,
+      trialDays: 7
     };
   }
 
@@ -137,7 +137,7 @@ class PaywallEngine {
             annual: this.PRICING.annual,
             trialDays: this.PRICING.trialDays
           },
-          primaryCta: "Start Free Trial",
+          primaryCta: "Start 7-day free trial",
           secondaryCta: type === "soft" ? "Maybe later" : null
         }
       }

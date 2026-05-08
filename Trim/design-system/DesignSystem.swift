@@ -2,17 +2,17 @@ import SwiftUI
 
 enum TrimDesignSystem {
     enum Colors {
-        static let background = Color(hex: "0F172A")
-        static let surface = Color(hex: "1E293B")
-        static let accentPrimary = Color(hex: "16A34A")
-        static let accentSecondary = Color(hex: "2563EB")
-        static let accentNeon = Color(hex: "00FF66")
-        static let glowPrimary = Color(hex: "16A34A").opacity(0.18)
-        static let glowNeon = Color(hex: "00FF66").opacity(0.22)
-        static let edgePrimary = Color(hex: "16A34A").opacity(0.35)
+        static let background = Color(hex: "0B1220")
+        static let surface = Color(hex: "121B2D")
+        static let accentPrimary = Color(hex: "22C55E")
+        static let accentSecondary = Color(hex: "2F6BFF")
+        static let accentNeon = Color(hex: "2DFF85")
+        static let glowPrimary = Color(hex: "22C55E").opacity(0.16)
+        static let glowNeon = Color(hex: "2DFF85").opacity(0.18)
+        static let edgePrimary = Color(hex: "22C55E").opacity(0.30)
         static let textPrimary = Color.white
         static let textSecondary = Color.white.opacity(0.7)
-        static let success = Color(hex: "16A34A")
+        static let success = Color(hex: "22C55E")
         static let warning = Color(hex: "D97706")
         static let error = Color(hex: "DC2626")
     }
@@ -82,6 +82,124 @@ struct GlassCard<Content: View>: View {
     }
 }
 
+struct PremiumGlassCard<Content: View>: View {
+    enum Variant {
+        case lifted
+        case inset
+    }
+    
+    let content: Content
+    private let cornerRadius: CGFloat
+    private let padding: CGFloat
+    private let variant: Variant
+    
+    init(
+        _ variant: Variant = .lifted,
+        cornerRadius: CGFloat = 22,
+        padding: CGFloat = 18,
+        @ViewBuilder content: () -> Content
+    ) {
+        self.variant = variant
+        self.cornerRadius = cornerRadius
+        self.padding = padding
+        self.content = content()
+    }
+    
+    var body: some View {
+        let shape = RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
+        let cardBackground = ZStack {
+            LinearGradient(
+                colors: [
+                    TrimDesignSystem.Colors.surface.opacity(0.92),
+                    TrimDesignSystem.Colors.surface.opacity(0.76),
+                    TrimDesignSystem.Colors.surface.opacity(0.68)
+                ],
+                startPoint: .topLeading,
+                endPoint: .bottomTrailing
+            )
+            
+            LinearGradient(
+                colors: [
+                    TrimDesignSystem.Colors.accentSecondary.opacity(0.10),
+                    Color.clear
+                ],
+                startPoint: .topLeading,
+                endPoint: .center
+            )
+        }
+        
+        switch variant {
+        case .lifted:
+            content
+                .padding(padding)
+                .background(cardBackground)
+                .clipShape(shape)
+                .overlay(
+                    shape.stroke(Color.white.opacity(0.10), lineWidth: 1)
+                )
+                .overlay(
+                    shape
+                        .stroke(
+                            LinearGradient(
+                                colors: [
+                                    TrimDesignSystem.Colors.accentSecondary.opacity(0.22),
+                                    Color.clear
+                                ],
+                                startPoint: .topLeading,
+                                endPoint: .bottomTrailing
+                            ),
+                            lineWidth: 1
+                        )
+                        .blendMode(.screen)
+                        .opacity(0.60)
+                )
+                .shadow(color: Color.black.opacity(0.60), radius: 26, x: 0, y: 18)
+                .shadow(color: Color.black.opacity(0.30), radius: 12, x: 0, y: 6)
+                .shadow(color: Color.white.opacity(0.05), radius: 1, x: -1, y: -1)
+            
+        case .inset:
+            content
+                .padding(padding)
+                .background(cardBackground)
+                .clipShape(shape)
+                .overlay(
+                    shape.stroke(Color.white.opacity(0.06), lineWidth: 1)
+                )
+                .overlay(
+                    shape
+                        .stroke(Color.black.opacity(0.35), lineWidth: 12)
+                        .blur(radius: 12)
+                        .offset(x: 7, y: 7)
+                        .mask(
+                            shape.fill(
+                                LinearGradient(
+                                    gradient: Gradient(colors: [Color.black, Color.clear]),
+                                    startPoint: .topLeading,
+                                    endPoint: .bottomTrailing
+                                )
+                            )
+                        )
+                )
+                .overlay(
+                    shape
+                        .stroke(Color.white.opacity(0.06), lineWidth: 8)
+                        .blur(radius: 10)
+                        .offset(x: -6, y: -6)
+                        .mask(
+                            shape.fill(
+                                LinearGradient(
+                                    gradient: Gradient(colors: [Color.clear, Color.black]),
+                                    startPoint: .topLeading,
+                                    endPoint: .bottomTrailing
+                                )
+                            )
+                        )
+                )
+                .shadow(color: Color.black.opacity(0.35), radius: 10, x: 0, y: 8)
+        }
+    }
+}
+
 private struct GlassCardStyle: ViewModifier {
     func body(content: Content) -> some View {
         let shape = RoundedRectangle(cornerRadius: TrimDesignSystem.Radius.medium, style: .continuous)
@@ -89,18 +207,30 @@ private struct GlassCardStyle: ViewModifier {
         return content
             .padding(TrimDesignSystem.Spacing.m)
             .background(
-                LinearGradient(
-                    colors: [
-                        TrimDesignSystem.Colors.surface.opacity(0.92),
-                        TrimDesignSystem.Colors.surface.opacity(0.72)
-                    ],
-                    startPoint: .topLeading,
-                    endPoint: .bottomTrailing
-                )
+                ZStack {
+                    LinearGradient(
+                        colors: [
+                            TrimDesignSystem.Colors.surface.opacity(0.92),
+                            TrimDesignSystem.Colors.surface.opacity(0.76),
+                            TrimDesignSystem.Colors.surface.opacity(0.68)
+                        ],
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    )
+                    
+                    LinearGradient(
+                        colors: [
+                            TrimDesignSystem.Colors.accentSecondary.opacity(0.10),
+                            Color.clear
+                        ],
+                        startPoint: .topLeading,
+                        endPoint: .center
+                    )
+                }
             )
             .clipShape(shape)
             .overlay(
-                shape.stroke(Color.white.opacity(0.1), lineWidth: 1)
+                shape.stroke(Color.white.opacity(0.10), lineWidth: 1)
             )
             .overlay(
                 shape
@@ -117,9 +247,25 @@ private struct GlassCardStyle: ViewModifier {
                         )
                     )
             )
-            .shadow(color: Color.black.opacity(0.7), radius: 20, x: 0, y: 14)
-            .shadow(color: Color.black.opacity(0.25), radius: 12, x: 0, y: 5)
-            .shadow(color: Color.white.opacity(0.05), radius: 1, x: -1, y: -1)
+            .overlay(
+                shape
+                    .stroke(
+                        LinearGradient(
+                            colors: [
+                                TrimDesignSystem.Colors.accentSecondary.opacity(0.20),
+                                Color.clear
+                            ],
+                            startPoint: .topLeading,
+                            endPoint: .bottomTrailing
+                        ),
+                        lineWidth: 1
+                    )
+                    .blendMode(.screen)
+                    .opacity(0.55)
+            )
+            .shadow(color: Color.black.opacity(0.65), radius: 26, x: 0, y: 18)
+            .shadow(color: Color.black.opacity(0.22), radius: 12, x: 0, y: 6)
+            .shadow(color: Color.white.opacity(0.06), radius: 1, x: -1, y: -1)
     }
 }
 
@@ -133,13 +279,13 @@ struct NeumorphicInset: ViewModifier {
     
     func body(content: Content) -> some View {
         content
-            .background(TrimDesignSystem.Colors.background.opacity(0.55))
+            .background(TrimDesignSystem.Colors.background.opacity(0.62))
             .clipShape(RoundedRectangle(cornerRadius: cornerRadius, style: .continuous))
             .overlay(
                 RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
-                    .stroke(Color.black.opacity(0.75), lineWidth: 10)
-                    .blur(radius: 10)
-                    .offset(x: 6, y: 6)
+                    .stroke(Color.black.opacity(0.72), lineWidth: 12)
+                    .blur(radius: 12)
+                    .offset(x: 7, y: 7)
                     .mask(
                         RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
                             .fill(
@@ -153,9 +299,9 @@ struct NeumorphicInset: ViewModifier {
             )
             .overlay(
                 RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
-                    .stroke(Color.white.opacity(0.1), lineWidth: 6)
-                    .blur(radius: 8)
-                    .offset(x: -4, y: -4)
+                    .stroke(Color.white.opacity(0.09), lineWidth: 7)
+                    .blur(radius: 10)
+                    .offset(x: -5, y: -5)
                     .mask(
                         RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
                             .fill(
@@ -176,13 +322,13 @@ struct RecessedCircle: ViewModifier {
         content
             .background(
                 Circle()
-                    .fill(TrimDesignSystem.Colors.background.opacity(0.55))
+                    .fill(TrimDesignSystem.Colors.background.opacity(0.62))
             )
             .overlay(
                 Circle()
-                    .stroke(Color.black.opacity(0.75), lineWidth: 10)
-                    .blur(radius: 10)
-                    .offset(x: 6, y: 6)
+                    .stroke(Color.black.opacity(0.72), lineWidth: 12)
+                    .blur(radius: 12)
+                    .offset(x: 7, y: 7)
                     .mask(
                         Circle()
                             .fill(
@@ -196,9 +342,9 @@ struct RecessedCircle: ViewModifier {
             )
             .overlay(
                 Circle()
-                    .stroke(Color.white.opacity(0.1), lineWidth: 6)
-                    .blur(radius: 8)
-                    .offset(x: -4, y: -4)
+                    .stroke(Color.white.opacity(0.09), lineWidth: 7)
+                    .blur(radius: 10)
+                    .offset(x: -5, y: -5)
                     .mask(
                         Circle()
                             .fill(

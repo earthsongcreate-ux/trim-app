@@ -17,7 +17,7 @@ struct ForgotPasswordView: View {
                 VStack(alignment: .leading, spacing: TrimDesignSystem.Spacing.xl) {
                     header
                     
-                    GlassCard {
+                    PremiumGlassCard(.inset) {
                         VStack(alignment: .leading, spacing: 8) {
                             Text("Email")
                                 .font(TrimDesignSystem.Typography.caption)

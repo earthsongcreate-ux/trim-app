@@ -30,10 +30,27 @@ struct RootView: View {
             if authViewModel.isCheckingSession {
                 loadingView
             } else if authViewModel.isAuthenticated {
-                SecureView {
-                    MainTabView()
+                if authViewModel.isLoadingProfile || authViewModel.profile == nil {
+                    loadingView
+                } else if authViewModel.profile?.onboardingComplete == false {
+                    SecureView {
+                        OnboardingView { firstName, monthlyIncome, monthlySavingsGoal in
+                            Task {
+                                await authViewModel.completeOnboarding(
+                                    firstName: firstName,
+                                    monthlyIncome: monthlyIncome,
+                                    monthlySavingsGoal: monthlySavingsGoal
+                                )
+                            }
+                        }
+                    }
+                    .transition(SecurityTransition.unlock)
+                } else {
+                    SecureView {
+                        MainTabView()
+                    }
+                    .transition(SecurityTransition.unlock)
                 }
-                .transition(SecurityTransition.unlock)
             } else {
                 AuthFlowView()
                     .transition(SecurityTransition.lock)

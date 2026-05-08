@@ -59,7 +59,7 @@ struct NegotiationWorkflowView: View {
                 .fontWeight(.bold)
                 .foregroundColor(.white)
             
-            GlassCard {
+            PremiumGlassCard {
                 VStack(spacing: 16) {
                     HStack {
                         Text("Current Monthly")
@@ -116,7 +116,7 @@ struct NegotiationWorkflowView: View {
                     .fontWeight(.bold)
                     .foregroundColor(.white)
                 
-                GlassCard {
+                PremiumGlassCard {
                     VStack(alignment: .leading, spacing: 12) {
                         Text("YOUR SCRIPT")
                             .font(.system(size: 8, weight: .black))

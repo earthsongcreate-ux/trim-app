@@ -17,11 +17,6 @@ struct FinancialOverview: Codable {
     let ytdReturn: Double // For the portfolio performance view
 }
 
-struct UserProfile: Codable {
-    let name: String
-    let financialGoal: String
-}
-
 enum ConfidenceLevel: String, Codable {
     case high, medium, low
 }
@@ -590,10 +585,28 @@ struct SavingsImpactResponse: Codable {
 
 // MARK: - Paywall Models
 
+enum SubscriptionPlan: String, Codable {
+    case monthly
+    case annual
+}
+
 struct PaywallPricing: Codable {
     let monthly: Double
     let annual: Double
     let trialDays: Int
+}
+
+struct FoundingAnnualOfferState: Codable, Equatable {
+    let limit: Int
+    let claimedCount: Int
+    
+    var remainingCount: Int {
+        max(limit - claimedCount, 0)
+    }
+    
+    var isAvailable: Bool {
+        claimedCount < limit
+    }
 }
 
 struct PaywallContent: Codable {

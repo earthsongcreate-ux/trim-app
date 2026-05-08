@@ -24,7 +24,7 @@ struct RegisterView: View {
                 VStack(alignment: .leading, spacing: TrimDesignSystem.Spacing.xl) {
                     header
                     
-                    GlassCard {
+                    PremiumGlassCard(.inset) {
                         VStack(spacing: TrimDesignSystem.Spacing.m) {
                             labeledField(
                                 title: "Email",

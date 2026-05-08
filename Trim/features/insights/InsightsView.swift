@@ -46,6 +46,7 @@ struct InsightsView: View {
                     } else if insights.isEmpty {
                         emptyState
                     } else {
+                        insightSummary
                         ScrollView {
                             VStack(spacing: 16) {
                                 ForEach(insights) { insight in
@@ -67,10 +68,10 @@ struct InsightsView: View {
             }
             .task {
                 do {
-                    insights = try await TrimApiService.shared.fetchInsights()
-                    // Only show insights the confidence engine approved
-                    insights = insights.filter { $0.showToUser }
-                    suppressedCount = max(0, insights.count - insights.filter { $0.showToUser }.count)
+                    let fetched = try await TrimApiService.shared.fetchInsights()
+                    let approved = fetched.filter { $0.showToUser }
+                    insights = approved
+                    suppressedCount = max(0, fetched.count - approved.count)
                     isLoading = false
                 } catch {
                     print("Error: \(error)")
@@ -101,6 +102,39 @@ struct InsightsView: View {
         .padding()
     }
     
+    private var insightSummary: some View {
+        let monthly = insights.reduce(0.0) { $0 + $1.monthlyImpact }
+        let annual = insights.reduce(0.0) { $0 + $1.annualImpact }
+        
+        return PremiumGlassCard {
+            HStack(alignment: .center, spacing: TrimDesignSystem.Spacing.m) {
+                ZStack {
+                    Circle()
+                        .fill(TrimDesignSystem.Colors.accentSecondary.opacity(0.12))
+                    Circle()
+                        .stroke(TrimDesignSystem.Colors.accentSecondary.opacity(0.35), lineWidth: 1)
+                    Image(systemName: "sparkles")
+                        .font(.system(size: 18, weight: .semibold))
+                        .foregroundColor(TrimDesignSystem.Colors.accentSecondary)
+                }
+                .frame(width: 44, height: 44)
+                
+                VStack(alignment: .leading, spacing: 4) {
+                    Text("\(insights.count) alerts ready")
+                        .font(TrimDesignSystem.Typography.subheader)
+                        .foregroundColor(TrimDesignSystem.Colors.textPrimary)
+                    
+                    Text("$\(Int(monthly.rounded()))/mo • $\(Int(annual.rounded()))/yr potential impact")
+                        .font(TrimDesignSystem.Typography.caption)
+                        .foregroundColor(TrimDesignSystem.Colors.textSecondary)
+                }
+                
+                Spacer()
+            }
+        }
+        .padding(.horizontal)
+    }
+    
     // MARK: - Helpers
     
     /// Creates a binding into the feedbackStates dictionary for a given insight ID.
@@ -118,7 +152,7 @@ struct InsightCard: View {
     var onAction: () -> Void
     
     var body: some View {
-        GlassCard {
+        PremiumGlassCard(.inset) {
             HStack(spacing: 16) {
                 iconForType(insight.type)
                     .font(.system(size: 24))

@@ -158,7 +158,7 @@ struct DashboardView: View {
     
     // MARK: - Coaching
     private func coachingSection(action: CoachingRecommendation) -> some View {
-        GlassCard {
+        PremiumGlassCard(.inset) {
             VStack(alignment: .leading, spacing: 12) {
                 HStack {
                     Image(systemName: coachingIcon(for: action.type))
@@ -232,7 +232,7 @@ struct DashboardView: View {
     
     // MARK: - Savings Impact
     private func savingsImpactSection(impact: SavingsImpact) -> some View {
-        GlassCard {
+        PremiumGlassCard(.inset) {
             VStack(alignment: .leading, spacing: 16) {
                 // Prominent card content
                 HStack(alignment: .center) {
@@ -315,7 +315,7 @@ struct DashboardView: View {
     
     // MARK: - Portfolio Performance
     private var portfolioPerformanceSection: some View {
-        GlassCard {
+        PremiumGlassCard(.inset) {
             VStack(alignment: .leading, spacing: 16) {
                 Text("Portfolio Performance")
                     .font(.system(size: 16, weight: .bold, design: .rounded))
@@ -339,7 +339,7 @@ struct DashboardView: View {
     
     // MARK: - Asset Allocation
     private var assetAllocationSection: some View {
-        GlassCard {
+        PremiumGlassCard(.inset) {
             VStack(alignment: .leading, spacing: 12) {
                 Text("Asset Allocation")
                     .font(.system(size: 14, weight: .bold, design: .rounded))
@@ -355,7 +355,7 @@ struct DashboardView: View {
     
     // MARK: - Upcoming Bills
     private var upcomingBillsSection: some View {
-        GlassCard {
+        PremiumGlassCard(.inset) {
             VStack(alignment: .leading, spacing: 12) {
                 HStack {
                     Text("Upcoming Bills")
@@ -405,8 +405,8 @@ struct DashboardView: View {
             
             LinearGradient(
                 colors: [
-                    TrimDesignSystem.Colors.accentNeon.opacity(0.12),
-                    TrimDesignSystem.Colors.accentPrimary.opacity(0.07),
+                    TrimDesignSystem.Colors.accentSecondary.opacity(0.16),
+                    TrimDesignSystem.Colors.accentPrimary.opacity(0.06),
                     Color.clear
                 ],
                 startPoint: .topLeading,
@@ -518,31 +518,6 @@ private struct LowerCardHeightsPreferenceKey: PreferenceKey {
     
     static func reduce(value: inout [String: CGFloat], nextValue: () -> [String: CGFloat]) {
         value.merge(nextValue(), uniquingKeysWith: { $1 })
-    }
-}
-
-private struct PremiumGlassCard<Content: View>: View {
-    let content: Content
-    
-    init(@ViewBuilder content: () -> Content) {
-        self.content = content()
-    }
-    
-    var body: some View {
-        let shape = RoundedRectangle(cornerRadius: 28, style: .continuous)
-        
-        content
-            .padding(24)
-            .background(.ultraThinMaterial)
-            .background(
-                shape.fill(Color.white.opacity(0.05))
-            )
-            .clipShape(shape)
-            .overlay(
-                shape.stroke(Color.white.opacity(0.10), lineWidth: 1)
-            )
-            .shadow(color: Color.black.opacity(0.6), radius: 26, x: 0, y: 18)
-            .shadow(color: Color.black.opacity(0.35), radius: 12, x: 0, y: 6)
     }
 }
 

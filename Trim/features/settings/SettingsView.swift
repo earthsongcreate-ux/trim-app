@@ -18,6 +18,8 @@ struct SettingsView: View {
                         .foregroundColor(TrimDesignSystem.Colors.textPrimary)
                         .padding(.top, 16)
                     
+                    premiumSection
+                    
                     currencySection
                     
                     securitySection
@@ -41,6 +43,103 @@ struct SettingsView: View {
         }
     }
     
+    private var premiumSection: some View {
+        VStack(alignment: .leading, spacing: TrimDesignSystem.Spacing.m) {
+            Text("Premium")
+                .font(TrimDesignSystem.Typography.subheader)
+                .foregroundColor(TrimDesignSystem.Colors.textPrimary)
+            
+            PremiumGlassCard(.inset) {
+                VStack(alignment: .leading, spacing: TrimDesignSystem.Spacing.m) {
+                    if let profile = authViewModel.profile, profile.isPremium {
+                        HStack(spacing: 12) {
+                            Image(systemName: profile.isFoundingMember ? "seal.fill" : "star.fill")
+                                .font(.system(size: 20))
+                                .foregroundColor(TrimDesignSystem.Colors.accentSecondary)
+                            
+                            VStack(alignment: .leading, spacing: 4) {
+                                Text(profile.isFoundingMember ? "Founding Member" : "Premium")
+                                    .font(TrimDesignSystem.Typography.body)
+                                    .foregroundColor(TrimDesignSystem.Colors.textPrimary)
+                                
+                                Text(trialStatusText(for: profile))
+                                    .font(TrimDesignSystem.Typography.caption)
+                                    .foregroundColor(TrimDesignSystem.Colors.textSecondary)
+                            }
+                            
+                            Spacer()
+                            
+                            Text(profile.isFoundingMember ? "Locked" : "Active")
+                                .font(.system(size: 12, weight: .semibold))
+                                .foregroundColor(TrimDesignSystem.Colors.accentPrimary)
+                                .padding(.horizontal, 10)
+                                .padding(.vertical, 6)
+                                .background(
+                                    RoundedRectangle(cornerRadius: TrimDesignSystem.Radius.small)
+                                        .stroke(TrimDesignSystem.Colors.accentPrimary.opacity(0.3), lineWidth: 1)
+                                )
+                        }
+                        
+                        if profile.isFoundingMember {
+                            Divider().background(Color.white.opacity(0.1))
+                            
+                            VStack(alignment: .leading, spacing: 8) {
+                                HStack(spacing: TrimDesignSystem.Spacing.xs) {
+                                    Image(systemName: "lock.fill")
+                                        .font(.system(size: 11))
+                                    Text("Your annual rate is locked at $99/year")
+                                        .font(.system(size: 12))
+                                }
+                                .foregroundColor(TrimDesignSystem.Colors.textSecondary)
+                                
+                                HStack(spacing: TrimDesignSystem.Spacing.xs) {
+                                    Image(systemName: "sparkles")
+                                        .font(.system(size: 11))
+                                    Text("Future premium features included")
+                                        .font(.system(size: 12))
+                                }
+                                .foregroundColor(TrimDesignSystem.Colors.textSecondary)
+                            }
+                        }
+                    } else {
+                        HStack(spacing: 12) {
+                            Image(systemName: "lock.fill")
+                                .font(.system(size: 20))
+                                .foregroundColor(TrimDesignSystem.Colors.textSecondary)
+                            
+                            VStack(alignment: .leading, spacing: 4) {
+                                Text("Free Plan")
+                                    .font(TrimDesignSystem.Typography.body)
+                                    .foregroundColor(TrimDesignSystem.Colors.textPrimary)
+                                
+                                Text("Upgrade on the paywall to unlock Premium.")
+                                    .font(TrimDesignSystem.Typography.caption)
+                                    .foregroundColor(TrimDesignSystem.Colors.textSecondary)
+                            }
+                            
+                            Spacer()
+                        }
+                    }
+                }
+            }
+        }
+    }
+    
+    private func trialStatusText(for profile: UserProfile) -> String {
+        if let subscriptionStatus = profile.subscriptionStatus, subscriptionStatus.lowercased() == "trial" {
+            return "Trial — \(profile.trialDays ?? 7) days"
+        }
+        if let plan = profile.subscriptionPlan {
+            switch plan {
+            case .monthly:
+                return "Monthly plan"
+            case .annual:
+                return "Annual plan"
+            }
+        }
+        return "Premium active"
+    }
+    
     // MARK: - Currency Section
     
     private var currencySection: some View {
@@ -49,7 +148,7 @@ struct SettingsView: View {
                 .font(TrimDesignSystem.Typography.subheader)
                 .foregroundColor(TrimDesignSystem.Colors.textPrimary)
             
-            GlassCard {
+            PremiumGlassCard(.inset) {
                 VStack(alignment: .leading, spacing: TrimDesignSystem.Spacing.m) {
                     // Current base currency display
                     HStack(spacing: 12) {
@@ -123,7 +222,7 @@ struct SettingsView: View {
                 .font(TrimDesignSystem.Typography.subheader)
                 .foregroundColor(TrimDesignSystem.Colors.textPrimary)
             
-            GlassCard {
+            PremiumGlassCard(.inset) {
                 VStack(alignment: .leading, spacing: TrimDesignSystem.Spacing.m) {
                     // Biometric status row
                     HStack(spacing: 12) {
@@ -184,7 +283,7 @@ struct SettingsView: View {
                 .font(TrimDesignSystem.Typography.subheader)
                 .foregroundColor(TrimDesignSystem.Colors.textPrimary)
             
-            GlassCard {
+            PremiumGlassCard(.inset) {
                 VStack(alignment: .leading, spacing: TrimDesignSystem.Spacing.m) {
                     HStack(spacing: 12) {
                         Image(systemName: "hand.raised.fill")
@@ -223,7 +322,7 @@ struct SettingsView: View {
                 .font(TrimDesignSystem.Typography.subheader)
                 .foregroundColor(TrimDesignSystem.Colors.textPrimary)
             
-            GlassCard {
+            PremiumGlassCard(.inset) {
                 VStack(alignment: .leading, spacing: TrimDesignSystem.Spacing.m) {
                     if let email = authViewModel.userEmail, !email.isEmpty {
                         HStack(spacing: 12) {
