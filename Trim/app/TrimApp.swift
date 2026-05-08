@@ -1,14 +1,16 @@
 import SwiftUI
-#if canImport(FirebaseCore)
 import FirebaseCore
-#endif
 
 class AppDelegate: NSObject, UIApplicationDelegate {
   func application(_ application: UIApplication,
                    didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey : Any]? = nil) -> Bool {
-    #if canImport(FirebaseCore)
-    FirebaseApp.configure()
-    #endif
+    if FirebaseApp.app() == nil {
+        if Bundle.main.path(forResource: "GoogleService-Info", ofType: "plist") != nil {
+            FirebaseApp.configure()
+        } else {
+            print("Firebase not configured: missing GoogleService-Info.plist")
+        }
+    }
     return true
   }
 }

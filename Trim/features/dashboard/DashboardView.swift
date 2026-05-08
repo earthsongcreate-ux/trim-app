@@ -10,6 +10,9 @@ struct DashboardView: View {
     
     @State private var selectedTab: String = "DASHBOARD"
     @State private var lowerCardsMaxHeight: CGFloat = 0
+    @State private var heroOpacity: Double = 0
+    @State private var heroProgress: CGFloat = 0
+    @State private var heroBalance: Double = 0
     
     var body: some View {
         ZStack {
@@ -56,6 +59,9 @@ struct DashboardView: View {
     private var dashboardContent: some View {
         ScrollView {
             VStack(spacing: 24) {
+                heroSection
+                quickStatsSection
+                
                 intelligenceAlertsSection
                 
                 if let priorityAction = coachingData?.priorityAction {
@@ -275,60 +281,35 @@ struct DashboardView: View {
     
     // MARK: - Header
     private var header: some View {
-        HStack(spacing: 12) {
-            HStack(spacing: 10) {
-                RoundedRectangle(cornerRadius: 7, style: .continuous)
-                    .fill(
-                        LinearGradient(
-                            colors: [
-                                TrimDesignSystem.Colors.accentPrimary.opacity(0.95),
-                                TrimDesignSystem.Colors.accentSecondary.opacity(0.9)
-                            ],
-                            startPoint: .topLeading,
-                            endPoint: .bottomTrailing
-                        )
-                    )
-                    .frame(width: 26, height: 26)
-                    .shadow(color: TrimDesignSystem.Colors.glowPrimary.opacity(0.9), radius: 10, x: 0, y: 6)
-                
-                Text("TRIM")
-                    .font(.system(size: 16, weight: .black, design: .rounded))
-                    .foregroundColor(.white)
-                    .kerning(1)
+        HStack {
+            HStack(spacing: 8) {
+                Image("logo")
+                    .resizable()
+                    .scaledToFit()
+                    .frame(height: 28)
             }
+            .foregroundColor(.white)
             
             Spacer()
             
-            HStack(spacing: 12) {
+            HStack(spacing: 16) {
                 Image(systemName: "bell")
-                    .font(.system(size: 14, weight: .semibold))
-                    .foregroundColor(.white)
-                    .frame(width: 34, height: 34)
-                    .background(.ultraThinMaterial)
-                    .background(TrimDesignSystem.Colors.surface.opacity(0.55))
-                    .clipShape(Circle())
-                    .overlay(
-                        Circle().stroke(Color.white.opacity(0.12), lineWidth: 1)
-                    )
                     .overlay(
                         Circle()
                             .fill(Color.red)
-                            .frame(width: 7, height: 7)
-                            .offset(x: 11, y: -11),
-                        alignment: .center
+                            .frame(width: 8, height: 8)
+                            .offset(x: 5, y: -5),
+                        alignment: .topTrailing
                     )
                 
                 Text("J.A.")
-                    .font(.system(size: 12, weight: .bold, design: .rounded))
-                    .foregroundColor(.white)
-                    .frame(width: 34, height: 34)
-                    .background(.ultraThinMaterial)
-                    .background(TrimDesignSystem.Colors.surface.opacity(0.55))
+                    .font(.caption)
+                    .fontWeight(.bold)
+                    .padding(8)
+                    .background(Color.white.opacity(0.1))
                     .clipShape(Circle())
-                    .overlay(
-                        Circle().stroke(Color.white.opacity(0.12), lineWidth: 1)
-                    )
             }
+            .foregroundColor(.white)
         }
     }
     
@@ -412,11 +393,9 @@ struct DashboardView: View {
             TabBarItem(icon: "gearshape", label: "SETTINGS", isSelected: selectedTab == "SETTINGS") { selectedTab = "SETTINGS" }
         }
         .padding(.vertical, 12)
-        .padding(.horizontal, 8)
         .background(.ultraThinMaterial)
-        .background(TrimDesignSystem.Colors.surface.opacity(0.9))
-        .overlay(Rectangle().frame(height: 1).foregroundColor(Color.white.opacity(0.14)), alignment: .top)
-        .shadow(color: Color.black.opacity(0.7), radius: 22, x: 0, y: -10)
+        .background(TrimDesignSystem.Colors.surface.opacity(0.8))
+        .overlay(Rectangle().frame(height: 1).foregroundColor(Color.white.opacity(0.1)), alignment: .top)
     }
 
     private var dashboardBackground: some View {
@@ -426,8 +405,8 @@ struct DashboardView: View {
             
             LinearGradient(
                 colors: [
-                    TrimDesignSystem.Colors.accentPrimary.opacity(0.18),
-                    TrimDesignSystem.Colors.accentSecondary.opacity(0.10),
+                    TrimDesignSystem.Colors.accentNeon.opacity(0.12),
+                    TrimDesignSystem.Colors.accentPrimary.opacity(0.07),
                     Color.clear
                 ],
                 startPoint: .topLeading,
@@ -455,6 +434,81 @@ struct DashboardView: View {
                 .preference(key: LowerCardHeightsPreferenceKey.self, value: [id: geo.size.height])
         }
     }
+    
+    private var heroSection: some View {
+        PremiumGlassCard {
+            VStack(alignment: .leading, spacing: 16) {
+                HStack(alignment: .top) {
+                    VStack(alignment: .leading, spacing: 6) {
+                        Text("Total Saved")
+                            .font(.system(size: 13, weight: .semibold, design: .rounded))
+                            .foregroundColor(TrimDesignSystem.Colors.textSecondary)
+                            .kerning(0.3)
+                        
+                        AnimatableCurrencyText(value: heroBalance)
+                            .font(.system(size: 38, weight: .black, design: .rounded))
+                            .foregroundColor(.white)
+                            .monospacedDigit()
+                            .lineLimit(1)
+                            .minimumScaleFactor(0.85)
+                    }
+                    
+                    Spacer()
+                    
+                    OnTrackBadge()
+                }
+                
+                VStack(alignment: .leading, spacing: 10) {
+                    HStack {
+                        Text("Monthly Goal")
+                            .font(.system(size: 13, weight: .semibold, design: .rounded))
+                            .foregroundColor(TrimDesignSystem.Colors.textSecondary)
+                        Spacer()
+                        Text("62%")
+                            .font(.system(size: 13, weight: .bold, design: .rounded))
+                            .foregroundColor(TrimDesignSystem.Colors.accentNeon)
+                            .monospacedDigit()
+                    }
+                    
+                    NeonProgressBar(progress: heroProgress)
+                        .frame(height: 10)
+                    
+                    Text("$1,240 added this week")
+                        .font(.system(size: 13, weight: .semibold, design: .rounded))
+                        .foregroundColor(TrimDesignSystem.Colors.accentNeon)
+                        .shadow(color: TrimDesignSystem.Colors.glowNeon, radius: 12, x: 0, y: 0)
+                }
+            }
+        }
+        .padding(.horizontal, 24)
+        .opacity(heroOpacity)
+        .onAppear {
+            if heroOpacity == 0 {
+                heroBalance = 0
+                heroProgress = 0
+                
+                withAnimation(.easeOut(duration: 0.35)) {
+                    heroOpacity = 1
+                }
+                
+                withAnimation(.easeOut(duration: 1.2)) {
+                    heroBalance = 12450.80
+                }
+                
+                withAnimation(.easeInOut(duration: 1.0).delay(0.1)) {
+                    heroProgress = 0.62
+                }
+            }
+        }
+    }
+    
+    private var quickStatsSection: some View {
+        HStack(spacing: 16) {
+            QuickStatCard(title: "Spent This Month", value: 1842, valuePrefix: "$", valueSuffix: "")
+            QuickStatCard(title: "Net Growth", value: 940, valuePrefix: "+$", valueSuffix: "")
+        }
+        .padding(.horizontal, 24)
+    }
 }
 
 // MARK: - Subviews
@@ -465,6 +519,131 @@ private struct LowerCardHeightsPreferenceKey: PreferenceKey {
     static func reduce(value: inout [String: CGFloat], nextValue: () -> [String: CGFloat]) {
         value.merge(nextValue(), uniquingKeysWith: { $1 })
     }
+}
+
+private struct PremiumGlassCard<Content: View>: View {
+    let content: Content
+    
+    init(@ViewBuilder content: () -> Content) {
+        self.content = content()
+    }
+    
+    var body: some View {
+        let shape = RoundedRectangle(cornerRadius: 28, style: .continuous)
+        
+        content
+            .padding(24)
+            .background(.ultraThinMaterial)
+            .background(
+                shape.fill(Color.white.opacity(0.05))
+            )
+            .clipShape(shape)
+            .overlay(
+                shape.stroke(Color.white.opacity(0.10), lineWidth: 1)
+            )
+            .shadow(color: Color.black.opacity(0.6), radius: 26, x: 0, y: 18)
+            .shadow(color: Color.black.opacity(0.35), radius: 12, x: 0, y: 6)
+    }
+}
+
+private struct OnTrackBadge: View {
+    var body: some View {
+        Text("On Track")
+            .font(.system(size: 12, weight: .bold, design: .rounded))
+            .foregroundColor(TrimDesignSystem.Colors.accentNeon)
+            .padding(.horizontal, 12)
+            .padding(.vertical, 6)
+            .background(
+                Capsule()
+                    .fill(TrimDesignSystem.Colors.accentNeon.opacity(0.12))
+            )
+            .overlay(
+                Capsule()
+                    .stroke(TrimDesignSystem.Colors.accentNeon.opacity(0.25), lineWidth: 1)
+            )
+            .shadow(color: TrimDesignSystem.Colors.glowNeon, radius: 14, x: 0, y: 0)
+    }
+}
+
+private struct NeonProgressBar: View {
+    let progress: CGFloat
+    
+    var body: some View {
+        GeometryReader { geo in
+            let clamped = min(max(progress, 0), 1)
+            ZStack(alignment: .leading) {
+                RoundedRectangle(cornerRadius: 999, style: .continuous)
+                    .fill(Color.white.opacity(0.07))
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 999, style: .continuous)
+                            .stroke(Color.white.opacity(0.08), lineWidth: 1)
+                    )
+                
+                RoundedRectangle(cornerRadius: 999, style: .continuous)
+                    .fill(TrimDesignSystem.Colors.accentNeon)
+                    .frame(width: geo.size.width * clamped)
+                    .shadow(color: TrimDesignSystem.Colors.glowNeon, radius: 18, x: 0, y: 0)
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 999, style: .continuous)
+                            .fill(Color.white.opacity(0.12))
+                            .frame(width: 6)
+                            .offset(x: max(0, geo.size.width * clamped - 6)),
+                        alignment: .leading
+                    )
+                    .clipped()
+            }
+        }
+    }
+}
+
+private struct QuickStatCard: View {
+    let title: String
+    let value: Double
+    let valuePrefix: String
+    let valueSuffix: String
+    
+    var body: some View {
+        PremiumGlassCard {
+            VStack(alignment: .leading, spacing: 10) {
+                Text(title)
+                    .font(.system(size: 13, weight: .semibold, design: .rounded))
+                    .foregroundColor(TrimDesignSystem.Colors.textSecondary)
+                    .lineLimit(1)
+                
+                Text("\(valuePrefix)\(Int(value))\(valueSuffix)")
+                    .font(.system(size: 22, weight: .black, design: .rounded))
+                    .foregroundColor(.white)
+                    .monospacedDigit()
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.85)
+            }
+        }
+        .frame(maxWidth: .infinity)
+    }
+}
+
+private struct AnimatableCurrencyText: View, Animatable {
+    var value: Double
+    
+    var animatableData: Double {
+        get { value }
+        set { value = newValue }
+    }
+    
+    var body: some View {
+        Text(Self.formatter.string(from: NSNumber(value: value)) ?? "$0.00")
+    }
+    
+    private static let formatter: NumberFormatter = {
+        let f = NumberFormatter()
+        f.numberStyle = .currency
+        f.currencyCode = "USD"
+        f.currencySymbol = "$"
+        f.locale = Locale(identifier: "en_US_POSIX")
+        f.maximumFractionDigits = 2
+        f.minimumFractionDigits = 2
+        return f
+    }()
 }
 
 struct MainRadialProgress: View {
@@ -644,35 +823,23 @@ struct TabBarItem: View {
     
     var body: some View {
         Button(action: action) {
-            ZStack {
-                if isSelected {
-                    RoundedRectangle(cornerRadius: 14, style: .continuous)
-                        .fill(TrimDesignSystem.Colors.accentPrimary.opacity(0.18))
-                        .blur(radius: 10)
-                        .padding(.horizontal, 10)
-                        .padding(.vertical, 2)
-                }
-                
-                VStack(spacing: 4) {
-                    Image(systemName: icon)
-                        .font(.system(size: 18, weight: .semibold))
-                    Text(label)
-                        .font(.system(size: 10, weight: .semibold, design: .rounded))
-                        .kerning(0.4)
-                }
-                .foregroundColor(isSelected ? TrimDesignSystem.Colors.accentPrimary : TrimDesignSystem.Colors.textSecondary.opacity(0.95))
+            VStack(spacing: 4) {
+                Image(systemName: icon)
+                    .font(.system(size: 20))
+                Text(label)
+                    .font(TrimDesignSystem.Typography.caption)
             }
             .frame(maxWidth: .infinity)
-            .padding(.vertical, 6)
-            .overlay(alignment: .top) {
-                if isSelected {
-                    Capsule()
-                        .fill(TrimDesignSystem.Colors.accentPrimary)
-                        .frame(width: 34, height: 3)
-                        .shadow(color: TrimDesignSystem.Colors.accentPrimary.opacity(0.7), radius: 8, x: 0, y: 4)
-                        .offset(y: -6)
-                }
-            }
+            .foregroundColor(isSelected ? TrimDesignSystem.Colors.accentPrimary : TrimDesignSystem.Colors.textSecondary)
+            .overlay(
+                isSelected ?
+                Rectangle()
+                    .fill(TrimDesignSystem.Colors.accentPrimary)
+                    .frame(height: 2)
+                    .offset(y: -25)
+                    .shadow(color: TrimDesignSystem.Colors.accentPrimary, radius: 4)
+                : nil
+            )
         }
         .trimPressAnimation()
     }

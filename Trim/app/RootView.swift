@@ -50,6 +50,7 @@ struct RootView: View {
                     .transition(SecurityTransition.shield)
             }
         }
+        .trackSessionActivity()
         .animation(isAccessGranted ? SecurityTransition.unlockAnimation : SecurityTransition.lockAnimation, value: isAccessGranted)
         .animation(SecurityTransition.shieldAnimation, value: showPrivacyShield)
         .environmentObject(authManager)
@@ -74,8 +75,6 @@ struct RootView: View {
             }
         }
         
-        // MARK: — Global Interaction Tracking
-        .trackSessionActivity()
     }
     
     // MARK: - Privacy Overlay

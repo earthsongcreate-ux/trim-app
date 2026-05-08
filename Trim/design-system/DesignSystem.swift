@@ -6,7 +6,9 @@ enum TrimDesignSystem {
         static let surface = Color(hex: "1E293B")
         static let accentPrimary = Color(hex: "16A34A")
         static let accentSecondary = Color(hex: "2563EB")
+        static let accentNeon = Color(hex: "00FF66")
         static let glowPrimary = Color(hex: "16A34A").opacity(0.18)
+        static let glowNeon = Color(hex: "00FF66").opacity(0.22)
         static let edgePrimary = Color(hex: "16A34A").opacity(0.35)
         static let textPrimary = Color.white
         static let textSecondary = Color.white.opacity(0.7)
