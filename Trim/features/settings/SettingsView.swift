@@ -2,6 +2,7 @@ import SwiftUI
 
 struct SettingsView: View {
     @EnvironmentObject var authManager: BiometricAuthManager
+    @EnvironmentObject private var authViewModel: AuthViewModel
     @ObservedObject private var currencyService = CurrencyService.shared
     
     @State private var showCurrencyPicker = false
@@ -22,6 +23,8 @@ struct SettingsView: View {
                     securitySection
                     
                     privacySection
+                    
+                    accountSection
                     
                     Spacer()
                 }
@@ -209,6 +212,58 @@ struct SettingsView: View {
                             text: "Banking credentials are never stored"
                         )
                     }
+                }
+            }
+        }
+    }
+    
+    private var accountSection: some View {
+        VStack(alignment: .leading, spacing: TrimDesignSystem.Spacing.m) {
+            Text("Account")
+                .font(TrimDesignSystem.Typography.subheader)
+                .foregroundColor(TrimDesignSystem.Colors.textPrimary)
+            
+            GlassCard {
+                VStack(alignment: .leading, spacing: TrimDesignSystem.Spacing.m) {
+                    if let email = authViewModel.userEmail, !email.isEmpty {
+                        HStack(spacing: 12) {
+                            Image(systemName: "envelope.fill")
+                                .font(.system(size: 18))
+                                .foregroundColor(TrimDesignSystem.Colors.accentPrimary)
+                            
+                            VStack(alignment: .leading, spacing: 4) {
+                                Text("Signed in as")
+                                    .font(TrimDesignSystem.Typography.caption)
+                                    .foregroundColor(TrimDesignSystem.Colors.textSecondary)
+                                Text(email)
+                                    .font(TrimDesignSystem.Typography.body)
+                                    .foregroundColor(TrimDesignSystem.Colors.textPrimary)
+                            }
+                            
+                            Spacer()
+                        }
+                        
+                        Divider().background(Color.white.opacity(0.1))
+                    }
+                    
+                    Button {
+                        authViewModel.signOut()
+                        authManager.logout()
+                    } label: {
+                        HStack(spacing: 10) {
+                            Image(systemName: "arrow.right.square")
+                            Text("Log Out")
+                                .font(.system(size: 14, weight: .semibold))
+                        }
+                        .foregroundColor(TrimDesignSystem.Colors.error)
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 10)
+                        .background(
+                            RoundedRectangle(cornerRadius: TrimDesignSystem.Radius.small)
+                                .stroke(TrimDesignSystem.Colors.error.opacity(0.35), lineWidth: 1)
+                        )
+                    }
+                    .trimPressAnimation()
                 }
             }
         }

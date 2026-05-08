@@ -15,6 +15,7 @@ import Combine
 /// 3. **Inactivity timeout** — locks after 90s of no interaction while in foreground.
 struct RootView: View {
     
+    @StateObject private var authViewModel = AuthViewModel()
     @StateObject private var authManager = BiometricAuthManager()
     @StateObject private var sessionManager = SessionManager()
     @Environment(\.scenePhase) private var scenePhase
@@ -22,23 +23,19 @@ struct RootView: View {
     /// Controls the privacy overlay that hides content in the app switcher.
     @State private var showPrivacyShield = false
     
-    // MARK: - Computed Access
-    
-    /// The user has full access only when both gates are satisfied.
-    private var isAccessGranted: Bool {
-        authManager.isAuthenticated && !sessionManager.isLocked
-    }
-    
     // MARK: - Body
     
     var body: some View {
         ZStack {
-            // Primary content gate
-            if isAccessGranted {
-                MainAppView()
-                    .transition(SecurityTransition.unlock)
+            if authViewModel.isCheckingSession {
+                loadingView
+            } else if authViewModel.isAuthenticated {
+                SecureView {
+                    MainTabView()
+                }
+                .transition(SecurityTransition.unlock)
             } else {
-                LockView()
+                AuthFlowView()
                     .transition(SecurityTransition.lock)
             }
             
@@ -50,9 +47,9 @@ struct RootView: View {
                     .transition(SecurityTransition.shield)
             }
         }
-        .trackSessionActivity()
-        .animation(isAccessGranted ? SecurityTransition.unlockAnimation : SecurityTransition.lockAnimation, value: isAccessGranted)
+        .animation(SecurityTransition.unlockAnimation, value: authViewModel.isAuthenticated)
         .animation(SecurityTransition.shieldAnimation, value: showPrivacyShield)
+        .environmentObject(authViewModel)
         .environmentObject(authManager)
         .environmentObject(sessionManager)
         
@@ -75,6 +72,26 @@ struct RootView: View {
             }
         }
         
+        // MARK: — Reactive: Firebase Auth → Session Gate
+        .onChange(of: authViewModel.isAuthenticated) { _, isAuthed in
+            if isAuthed {
+                sessionManager.startSession()
+            } else {
+                authManager.logout()
+                sessionManager.lock()
+            }
+        }
+        
+    }
+    
+    private var loadingView: some View {
+        ZStack {
+            TrimDesignSystem.Colors.background
+                .ignoresSafeArea()
+            ProgressView()
+                .progressViewStyle(CircularProgressViewStyle(tint: TrimDesignSystem.Colors.accentPrimary))
+                .scaleEffect(1.2)
+        }
     }
     
     // MARK: - Privacy Overlay
@@ -129,21 +146,6 @@ struct RootView: View {
             
         @unknown default:
             break
-        }
-    }
-}
-
-// MARK: - MainAppView
-
-/// Wrapper for the authenticated app content.
-///
-/// Wraps feature views in `SecureView` for session-level protection and
-/// tracks user interactions to reset the inactivity timer.
-struct MainAppView: View {
-    
-    var body: some View {
-        SecureView {
-            DashboardView()
         }
     }
 }
