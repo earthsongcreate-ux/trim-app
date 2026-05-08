@@ -145,6 +145,8 @@ final class BiometricAuthManager: ObservableObject {
             return .touchID
         case .opticID:
             return .faceID // Treat Vision Pro optic ID as Face ID equivalent
+        case .none:
+            return .passcode
         @unknown default:
             return .passcode
         }

@@ -57,7 +57,7 @@ struct RootView: View {
         .environmentObject(sessionManager)
         
         // MARK: — Lifecycle: Scene Phase
-        .onChange(of: scenePhase) { newPhase in
+        .onChange(of: scenePhase) { _, newPhase in
             handleScenePhaseChange(newPhase)
         }
         

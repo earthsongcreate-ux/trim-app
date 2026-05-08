@@ -59,7 +59,7 @@ struct BankConnectionView: View {
                 .environmentObject(plaidManager)
         }
         // Auto-dismiss Plaid sheet when flow completes
-        .onChange(of: plaidManager.state) { newState in
+        .onChange(of: plaidManager.state) { _, newState in
             if newState == .success || newState == .exited || newState.isError {
                 showPlaidLink = false
             }

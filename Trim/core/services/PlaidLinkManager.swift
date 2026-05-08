@@ -98,11 +98,7 @@ final class PlaidLinkManager: ObservableObject {
         connectedInstitution = nil
         connectedAccountCount = 0
 
-#if !canImport(LinkKit)
-        state = .error("Plaid LinkKit is not installed in this build.")
-        return
-#endif
-        
+#if canImport(LinkKit)
         do {
             let linkToken = try await fetchLinkToken()
             configureLinkHandler(with: linkToken)
@@ -112,6 +108,9 @@ final class PlaidLinkManager: ObservableObject {
         } catch {
             state = .error(error.localizedDescription)
         }
+#else
+        state = .error("Plaid LinkKit is not installed in this build.")
+#endif
     }
     
     /// Resets all state back to idle. Call when dismissing the connection UI.
