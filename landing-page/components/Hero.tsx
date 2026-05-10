@@ -59,7 +59,7 @@ export default function Hero() {
             <div className="absolute inset-0 bg-trim-green/20 blur-[100px] rounded-full" />
             <div className="relative z-10 glass-card p-2 md:p-4 rotate-3 hover:rotate-0 transition-all duration-500 hover:shadow-[0_0_50px_rgba(110,196,153,0.2)]">
                <Image 
-                src="/images/hero_mockup.png" 
+                src="/images/hero-mockup.png" 
                 alt="Trim App Dashboard" 
                 width={500} 
                 height={1000}

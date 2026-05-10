@@ -16,9 +16,9 @@ export default function Navbar() {
       </Link>
       
       <div className="hidden md:flex items-center gap-8 text-sm font-medium text-gray-400">
-        <Link href="#features" className="hover:text-white transition-colors">Features</Link>
-        <Link href="#how-it-works" className="hover:text-white transition-colors">How it works</Link>
-        <Link href="/contact" className="hover:text-white transition-colors">Support</Link>
+        <Link href="/#features" className="hover:text-white transition-colors">Features</Link>
+        <Link href="/#how-it-works" className="hover:text-white transition-colors">How it works</Link>
+        <Link href="/support" className="hover:text-white transition-colors">Support</Link>
       </div>
 
       <Link href="#download" className="px-5 py-2.5 rounded-full bg-trim-green text-background text-sm font-bold neon-glow">

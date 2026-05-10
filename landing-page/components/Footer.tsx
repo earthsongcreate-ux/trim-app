@@ -11,7 +11,7 @@ export default function Footer() {
         <div className="col-span-1 md:col-span-2">
           <Link href="/" className="flex items-center gap-3 mb-6">
             <img 
-              src="/logo.png" 
+              src="/images/logo.png" 
               alt="Trim Logo" 
               className="h-8 w-auto object-contain"
             />
@@ -19,18 +19,21 @@ export default function Footer() {
           <p className="text-gray-400 max-w-sm mb-6">
             The world's first AI-powered subscription manager and automated savings engine.
           </p>
+          <p className="text-gray-400 max-w-sm mb-6">
+            Built to help you recover wasted money.
+          </p>
           <div className="flex items-center gap-2 text-trim-green">
             <Mail className="w-5 h-5" />
-            <a href="mailto:support@trimapp.co" className="hover:underline">support@trimapp.co</a>
+            <Link href="/support" className="hover:underline">support@trimapp.co</Link>
           </div>
         </div>
 
         <div>
           <h4 className="font-bold mb-6">Product</h4>
           <ul className="space-y-4 text-gray-400">
-            <li><Link href="#features" className="hover:text-white transition-colors">Features</Link></li>
-            <li><Link href="#how-it-works" className="hover:text-white transition-colors">How it works</Link></li>
-            <li><Link href="/contact" className="hover:text-white transition-colors">Contact</Link></li>
+            <li><Link href="/#features" className="hover:text-white transition-colors">Features</Link></li>
+            <li><Link href="/#how-it-works" className="hover:text-white transition-colors">How it works</Link></li>
+            <li><Link href="/support" className="hover:text-white transition-colors">Support</Link></li>
           </ul>
         </div>
 
@@ -43,7 +46,7 @@ export default function Footer() {
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto pt-10 border-t border-white/5 flex flex-col md:row items-center justify-between gap-6 text-sm text-gray-500">
+      <div className="max-w-7xl mx-auto pt-10 border-t border-white/5 flex flex-col md:flex-row items-center justify-between gap-6 text-sm text-gray-500">
         <p>© 2024 Trim Financial Inc. All rights reserved.</p>
         <div className="flex gap-8">
           <a href="#" className="hover:text-white transition-colors">Twitter</a>
