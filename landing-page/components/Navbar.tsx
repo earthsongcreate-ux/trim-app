@@ -11,7 +11,7 @@ export default function Navbar() {
         <img 
           src="/images/logo.png" 
           alt="Trim Logo" 
-          className="h-8 w-auto object-contain"
+          className="h-9 md:h-10 w-auto object-contain"
         />
       </Link>
       

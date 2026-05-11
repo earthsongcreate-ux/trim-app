@@ -24,7 +24,7 @@ export default function Terms() {
               <img
                 src="/images/logo.png"
                 alt="Trim Logo"
-                className="h-7 w-auto object-contain"
+                className="h-8 md:h-9 w-auto object-contain"
               />
             </Link>
           </div>

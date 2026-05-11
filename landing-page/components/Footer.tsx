@@ -2,7 +2,7 @@
 
 import React from "react";
 import Link from "next/link";
-import { Zap, Mail } from "lucide-react";
+import { Mail } from "lucide-react";
 
 export default function Footer() {
   return (
@@ -13,7 +13,7 @@ export default function Footer() {
             <img 
               src="/images/logo.png" 
               alt="Trim Logo" 
-              className="h-8 w-auto object-contain"
+              className="h-9 md:h-10 w-auto object-contain"
             />
           </Link>
           <p className="text-gray-400 max-w-sm mb-6">
@@ -31,15 +31,16 @@ export default function Footer() {
         <div>
           <h4 className="font-bold mb-6">Product</h4>
           <ul className="space-y-4 text-gray-400">
+            <li><Link href="/" className="hover:text-white transition-colors">Home</Link></li>
             <li><Link href="/#features" className="hover:text-white transition-colors">Features</Link></li>
             <li><Link href="/#how-it-works" className="hover:text-white transition-colors">How it works</Link></li>
-            <li><Link href="/support" className="hover:text-white transition-colors">Support</Link></li>
           </ul>
         </div>
 
         <div>
           <h4 className="font-bold mb-6">Legal</h4>
           <ul className="space-y-4 text-gray-400">
+            <li><Link href="/support" className="hover:text-white transition-colors">Support</Link></li>
             <li><Link href="/privacy" className="hover:text-white transition-colors">Privacy Policy</Link></li>
             <li><Link href="/terms" className="hover:text-white transition-colors">Terms of Service</Link></li>
           </ul>
@@ -47,7 +48,7 @@ export default function Footer() {
       </div>
 
       <div className="max-w-7xl mx-auto pt-10 border-t border-white/5 flex flex-col md:flex-row items-center justify-between gap-6 text-sm text-gray-500">
-        <p>© 2024 Trim Financial Inc. All rights reserved.</p>
+        <p>© 2026 Veloran Labs. All rights reserved.</p>
         <div className="flex gap-8">
           <a href="#" className="hover:text-white transition-colors">Twitter</a>
           <a href="#" className="hover:text-white transition-colors">Instagram</a>
