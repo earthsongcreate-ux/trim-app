@@ -1,7 +1,6 @@
 "use client";
 
 import React from "react";
-import Image from "next/image";
 import { motion } from "framer-motion";
 
 const screens = [
@@ -37,11 +36,11 @@ export default function AppPreview() {
           >
             <div className="p-2 md:p-3 mb-6 group relative overflow-hidden transition-all duration-500 rounded-2xl bg-[rgba(255,255,255,0.03)] border border-[rgba(255,255,255,0.06)] backdrop-blur-md shadow-[0_10px_40px_rgba(0,0,0,0.4)] hover:shadow-[0_0_40px_rgba(110,196,153,0.15)] hover:border-trim-green/30">
               <div className="aspect-[9/18] relative overflow-hidden rounded-xl bg-transparent">
-                <Image 
-                  src={screen.img} 
-                  alt={screen.title} 
-                  fill
-                  className="object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
+                <img
+                  src={screen.img}
+                  alt={screen.title}
+                  className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
+                  loading="lazy"
                 />
               </div>
             </div>

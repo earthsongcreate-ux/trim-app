@@ -1,5 +1,3 @@
-"use client";
-
 import Link from "next/link";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
@@ -55,12 +53,12 @@ export default function SupportPage() {
               >
                 Browse FAQs
               </Link>
-              <Link
-                href="/contact"
+              <a
+                href="mailto:support@trimapp.co"
                 className="px-6 py-3 rounded-xl border border-white/10 bg-white/5 text-sm font-bold text-white text-center hover:bg-white/10 transition-colors"
               >
-                Contact Form
-              </Link>
+                Email Support
+              </a>
             </div>
           </div>
 
@@ -73,7 +71,12 @@ export default function SupportPage() {
                 <h2 className="text-lg md:text-xl font-bold">Contact Email</h2>
               </div>
               <p className="mt-4 text-gray-400">Support email</p>
-              <p className="mt-2 text-xl font-bold text-white select-all">support@trimapp.co</p>
+              <a
+                href="mailto:support@trimapp.co"
+                className="mt-2 text-xl font-bold text-white select-all hover:underline inline-block"
+              >
+                support@trimapp.co
+              </a>
             </div>
 
             <div className="glass-card p-7 md:p-8">
@@ -109,12 +112,12 @@ export default function SupportPage() {
               <p className="text-gray-300">
                 Still stuck? Send us a note at <span className="font-semibold text-white select-all">support@trimapp.co</span>.
               </p>
-              <Link
-                href="/contact"
+              <a
+                href="mailto:support@trimapp.co"
                 className="px-5 py-2.5 rounded-xl bg-trim-green text-background text-sm font-bold neon-glow"
               >
-                Message Support
-              </Link>
+                Email Support
+              </a>
             </div>
           </div>
         </div>
@@ -124,4 +127,3 @@ export default function SupportPage() {
     </main>
   );
 }
-

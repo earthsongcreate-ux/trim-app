@@ -1,5 +1,3 @@
-"use client";
-
 import React from "react";
 import Link from "next/link";
 import { Mail } from "lucide-react";
@@ -24,7 +22,7 @@ export default function Footer() {
           </p>
           <div className="flex items-center gap-2 text-trim-green">
             <Mail className="w-5 h-5" />
-            <Link href="/support" className="hover:underline">support@trimapp.co</Link>
+            <a href="mailto:support@trimapp.co" className="hover:underline">support@trimapp.co</a>
           </div>
         </div>
 

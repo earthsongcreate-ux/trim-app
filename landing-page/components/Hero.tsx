@@ -1,7 +1,6 @@
 "use client";
 
 import React from "react";
-import Image from "next/image";
 import Link from "next/link";
 import { ChevronRight } from "lucide-react";
 import { motion } from "framer-motion";
@@ -58,13 +57,14 @@ export default function Hero() {
              {/* Ambient soft glow behind phone */}
             <div className="absolute inset-0 bg-trim-green/20 blur-[100px] rounded-full" />
             <div className="relative z-10 glass-card p-2 md:p-4 rotate-3 hover:rotate-0 transition-all duration-500 hover:shadow-[0_0_50px_rgba(110,196,153,0.2)]">
-               <Image 
-                src="/images/hero-mockup.png" 
-                alt="Trim App Dashboard" 
-                width={500} 
+              <img
+                src="/images/hero-mockup.png"
+                alt="Trim App Dashboard"
+                width={500}
                 height={1000}
                 className="rounded-xl shadow-2xl"
-                priority
+                loading="eager"
+                fetchPriority="high"
               />
             </div>
           </motion.div>
