@@ -47,12 +47,12 @@ export default function SupportPage() {
             </p>
 
             <div className="mt-8 flex flex-col sm:flex-row gap-3">
-              <Link
+              <a
                 href="#faq"
                 className="px-6 py-3 rounded-xl bg-trim-green text-background text-sm font-bold neon-glow text-center"
               >
                 Browse FAQs
-              </Link>
+              </a>
               <a
                 href="mailto:support@trimapp.co"
                 className="px-6 py-3 rounded-xl border border-white/10 bg-white/5 text-sm font-bold text-white text-center hover:bg-white/10 transition-colors"

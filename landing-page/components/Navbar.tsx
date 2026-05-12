@@ -1,6 +1,5 @@
 import React from "react";
 import Link from "next/link";
-import { Zap } from "lucide-react";
 
 export default function Navbar() {
   return (
@@ -19,9 +18,9 @@ export default function Navbar() {
         <Link href="/support" className="hover:text-white transition-colors">Support</Link>
       </div>
 
-      <Link href="#download" className="px-5 py-2.5 rounded-full bg-trim-green text-background text-sm font-bold neon-glow">
+      <a href="#download" className="px-5 py-2.5 rounded-full bg-trim-green text-background text-sm font-bold neon-glow">
         Download App
-      </Link>
+      </a>
     </nav>
   );
 }

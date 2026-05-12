@@ -28,15 +28,15 @@ export default function Hero() {
           
           <DeviceButtons />
 
-          <Link 
-            href="#how-it-works" 
+          <a
+            href="#how-it-works"
             className="inline-flex items-center gap-2 mt-10 text-trim-green font-medium group hover:text-white transition-all duration-300"
           >
             <span className="group-hover:drop-shadow-[0_0_12px_rgba(110,196,153,0.25)] transition-all">
               See how it works
             </span>
             <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-          </Link>
+          </a>
         </motion.div>
 
         <motion.div 

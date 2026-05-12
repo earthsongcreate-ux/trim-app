@@ -48,9 +48,9 @@ export default function Footer() {
       <div className="max-w-7xl mx-auto pt-10 border-t border-white/5 flex flex-col md:flex-row items-center justify-between gap-6 text-sm text-gray-500">
         <p>© 2026 Veloran Labs. All rights reserved.</p>
         <div className="flex gap-8">
-          <a href="#" className="hover:text-white transition-colors">Twitter</a>
-          <a href="#" className="hover:text-white transition-colors">Instagram</a>
-          <a href="#" className="hover:text-white transition-colors">LinkedIn</a>
+          <a href="https://x.com/" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">Twitter</a>
+          <a href="https://instagram.com/" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">Instagram</a>
+          <a href="https://linkedin.com/" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">LinkedIn</a>
         </div>
       </div>
     </footer>
