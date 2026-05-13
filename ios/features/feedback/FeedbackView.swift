@@ -398,7 +398,7 @@ class FeedbackService {
     static let shared = FeedbackService()
     
     private let baseURL: String = {
-        ProcessInfo.processInfo.environment["TRIM_API_URL"] ?? "http://localhost:3001"
+        ProcessInfo.processInfo.environment["TRIM_API_URL"] ?? "http://localhost:8000"
     }()
     
     private init() {}
@@ -442,7 +442,7 @@ class FeedbackService {
     // MARK: - Private
     
     private func send(_ feedback: FeedbackRequest) async {
-        guard let url = URL(string: "\(baseURL)/api/feedback") else { return }
+        guard let url = URL(string: "\(baseURL)/api/v1/feedback") else { return }
         
         var urlRequest = URLRequest(url: url)
         urlRequest.httpMethod = "POST"

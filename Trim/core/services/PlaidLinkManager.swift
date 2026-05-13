@@ -185,7 +185,7 @@ final class PlaidLinkManager: ObservableObject {
     private func handleLinkSuccess(_ result: LinkSuccess) {
         DispatchQueue.main.async {
             self.publicToken = result.publicToken
-            self.connectedInstitution = result.metadata.institution?.name
+            self.connectedInstitution = result.metadata.institution.name
             self.connectedAccountCount = result.metadata.accounts.count
             self.state = .success
         }
@@ -212,7 +212,7 @@ final class PlaidLinkManager: ObservableObject {
         print("[PlaidLink] Event: \(event.eventName)")
         #endif
         
-        if event.eventName == "OPEN" {
+        if String(describing: event.eventName) == "OPEN" {
             DispatchQueue.main.async {
                 self.state = .active
             }

@@ -31,7 +31,7 @@ class TrimApiService {
     
     /// Backend base URL — injected via environment or defaults to localhost
     private let baseURL: String = {
-        ProcessInfo.processInfo.environment["TRIM_API_URL"] ?? "http://localhost:3001"
+        ProcessInfo.processInfo.environment["TRIM_API_URL"] ?? "http://localhost:8000"
     }()
     
     private init() {}

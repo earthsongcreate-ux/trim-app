@@ -82,6 +82,7 @@ final class AuthViewModel: ObservableObject {
         errorMessage = nil
         do {
             try authService.signOut()
+            try? KeychainManager.shared.delete(key: "trim_access_token")
             profile = nil
         } catch {
             errorMessage = "Couldn’t sign out. Please try again."
@@ -211,12 +212,14 @@ final class AuthViewModel: ObservableObject {
         self.user = user
         if user == nil {
             profile = nil
+            try? KeychainManager.shared.delete(key: "trim_access_token")
             isCheckingSession = false
             isLoadingProfile = false
             return
         }
         
         Task { @MainActor in
+            await refreshBackendToken(for: user!)
             await loadUserProfile(for: user!, isInitial: false)
         }
     }
@@ -235,11 +238,37 @@ final class AuthViewModel: ObservableObject {
         }
         
         do {
+            await refreshBackendToken(for: user)
             try await UserProfileService.shared.createUserProfileIfNeeded(user: user)
             profile = try await UserProfileService.shared.fetchUserProfile(uid: user.uid)
         } catch {
             profile = nil
             errorMessage = "We couldn’t load your account details. Please try again."
+        }
+    }
+
+    private func refreshBackendToken(for user: User) async {
+        do {
+            let token = try await fetchFirebaseIdToken(for: user)
+            try KeychainManager.shared.save(key: "trim_access_token", value: token)
+        } catch {
+            try? KeychainManager.shared.delete(key: "trim_access_token")
+        }
+    }
+    
+    private func fetchFirebaseIdToken(for user: User) async throws -> String {
+        try await withCheckedThrowingContinuation { continuation in
+            user.getIDTokenForcingRefresh(true) { token, error in
+                if let error {
+                    continuation.resume(throwing: error)
+                    return
+                }
+                guard let token, !token.isEmpty else {
+                    continuation.resume(throwing: AuthFlowError.profileSetupFailed)
+                    return
+                }
+                continuation.resume(returning: token)
+            }
         }
     }
 }

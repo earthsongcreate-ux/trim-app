@@ -31,7 +31,7 @@ class TrimApiService {
     
     /// Backend base URL — injected via environment or defaults to localhost
     private let baseURL: String = {
-        ProcessInfo.processInfo.environment["TRIM_API_URL"] ?? "http://localhost:3001"
+        ProcessInfo.processInfo.environment["TRIM_API_URL"] ?? "http://localhost:8000"
     }()
     
     private init() {}
@@ -217,14 +217,18 @@ extension TrimApiService {
     }
     
     func fetchCoaching(userId: String = "default") async throws -> CoachingData? {
-        guard let url = URL(string: "\(baseURL)/api/coaching?userId=\(userId)") else {
+        guard let url = URL(string: "\(baseURL)/api/v1/coaching") else {
             throw NetworkError.invalidURL
         }
         
         do {
-            let (data, _) = try await URLSession.shared.data(from: url)
-            let response = try JSONDecoder().decode(CoachingResponse.self, from: data)
-            return response.coaching
+            var request = URLRequest(url: url)
+            request.httpMethod = "GET"
+            request.allHTTPHeaderFields = try getAuthHeaders()
+            let (data, response) = try await URLSession.shared.data(for: request)
+            try verifyResponse(response)
+            let decoded = try JSONDecoder().decode(CoachingResponse.self, from: data)
+            return decoded.coaching
         } catch {
             print("[TrimApiService] Coaching fetch failed: \(error.localizedDescription)")
             return nil
@@ -232,19 +236,23 @@ extension TrimApiService {
     }
     
     func fetchSavingsImpact(userId: String = "default") async throws -> SavingsImpact? {
-        guard let url = URL(string: "\(baseURL)/api/savings/impact?userId=\(userId)") else {
+        guard let url = URL(string: "\(baseURL)/api/v1/savings/impact") else {
             throw NetworkError.invalidURL
         }
         
         do {
-            let (data, _) = try await URLSession.shared.data(from: url)
-            let response = try JSONDecoder().decode(SavingsImpactResponse.self, from: data)
-            if response.success {
+            var request = URLRequest(url: url)
+            request.httpMethod = "GET"
+            request.allHTTPHeaderFields = try getAuthHeaders()
+            let (data, response) = try await URLSession.shared.data(for: request)
+            try verifyResponse(response)
+            let decoded = try JSONDecoder().decode(SavingsImpactResponse.self, from: data)
+            if decoded.success {
                 return SavingsImpact(
-                    totalSaved: response.totalSaved ?? 0.0,
-                    monthlySavings: response.monthlySavings ?? 0.0,
-                    annualProjection: response.annualProjection ?? 0.0,
-                    recentWins: response.recentWins ?? []
+                    totalSaved: decoded.totalSaved ?? 0.0,
+                    monthlySavings: decoded.monthlySavings ?? 0.0,
+                    annualProjection: decoded.annualProjection ?? 0.0,
+                    recentWins: decoded.recentWins ?? []
                 )
             }
             return nil
@@ -257,12 +265,22 @@ extension TrimApiService {
     // MARK: - Paywall Service
     
     func evaluatePaywall(context: String) async throws -> PaywallEvaluationResponse? {
-        guard let url = URL(string: "\(baseURL)/api/paywall/evaluate?userId=default&context=\(context)") else {
+        guard var components = URLComponents(string: "\(baseURL)/api/v1/paywall/evaluate") else {
             throw NetworkError.invalidURL
         }
         
+        components.queryItems = [
+            URLQueryItem(name: "context", value: context)
+        ]
+        
+        guard let url = components.url else { throw NetworkError.invalidURL }
+        
         do {
-            let (data, _) = try await URLSession.shared.data(from: url)
+            var request = URLRequest(url: url)
+            request.httpMethod = "GET"
+            request.allHTTPHeaderFields = try getAuthHeaders()
+            let (data, response) = try await URLSession.shared.data(for: request)
+            try verifyResponse(response)
             return try JSONDecoder().decode(PaywallEvaluationResponse.self, from: data)
         } catch {
             print("[TrimApiService] Paywall evaluation failed: \(error.localizedDescription)")
@@ -271,19 +289,20 @@ extension TrimApiService {
     }
     
     func interactWithPaywall(action: String) async throws {
-        guard let url = URL(string: "\(baseURL)/api/paywall/interact") else {
+        guard let url = URL(string: "\(baseURL)/api/v1/paywall/interact") else {
             throw NetworkError.invalidURL
         }
         
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
-        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        request.allHTTPHeaderFields = try getAuthHeaders()
         
-        let body = ["userId": "default", "action": action]
+        let body = ["action": action]
         request.httpBody = try JSONSerialization.data(withJSONObject: body)
         
         do {
-            let _ = try await URLSession.shared.data(for: request)
+            let (_, response) = try await URLSession.shared.data(for: request)
+            try verifyResponse(response)
         } catch {
             print("[TrimApiService] Paywall interact failed: \(error.localizedDescription)")
         }

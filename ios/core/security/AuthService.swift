@@ -165,7 +165,7 @@ final class AuthService: ObservableObject {
     }
     
     private func syncWithBackend(token: String) {
-        let backendUrl = ProcessInfo.processInfo.environment["TRIM_API_URL"] ?? "http://localhost:3001"
+        let backendUrl = ProcessInfo.processInfo.environment["TRIM_API_URL"] ?? "http://localhost:8000"
         guard let url = URL(string: "\(backendUrl)/api/v1/auth/verify") else { return }
         
         var request = URLRequest(url: url)
