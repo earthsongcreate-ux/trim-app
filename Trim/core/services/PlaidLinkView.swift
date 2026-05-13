@@ -25,7 +25,7 @@ import LinkKit
 struct PlaidLinkView: UIViewControllerRepresentable {
     
     @EnvironmentObject private var plaidManager: PlaidLinkManager
-    @Environment(\.dismiss) private var dismiss
+    @SwiftUI.Environment(\.dismiss) private var dismiss
     
     func makeUIViewController(context: Context) -> UIViewController {
         let viewController = UIViewController()

