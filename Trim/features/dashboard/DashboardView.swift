@@ -283,10 +283,8 @@ struct DashboardView: View {
     private var header: some View {
         HStack {
             HStack(spacing: 8) {
-                Image("logo")
-                    .resizable()
-                    .scaledToFit()
-                    .frame(height: 28)
+                Text("Trim")
+                    .font(.system(size: 20, weight: .heavy))
             }
             .foregroundColor(.white)
             

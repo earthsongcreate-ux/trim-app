@@ -62,6 +62,7 @@ final class AuthViewModel: ObservableObject {
     func signUp(email: String, password: String) async {
         await runAuthTask { [self] in
             let user = try await self.authService.createUser(email: email, password: password)
+            try await refreshBackendToken(for: user)
             do {
                 try await UserProfileService.shared.createUserProfileIfNeeded(user: user)
                 self.profile = try await UserProfileService.shared.fetchUserProfile(uid: user.uid)
@@ -159,6 +160,12 @@ final class AuthViewModel: ObservableObject {
         errorMessage = nil
     }
     
+    func retryProfileLoad() async {
+        guard let user else { return }
+        guard !isLoadingProfile else { return }
+        await loadUserProfile(for: user, isInitial: false)
+    }
+    
     func isValidEmail(_ email: String) -> Bool {
         let trimmed = email.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !trimmed.isEmpty else { return false }
@@ -219,7 +226,7 @@ final class AuthViewModel: ObservableObject {
         }
         
         Task { @MainActor in
-            await refreshBackendToken(for: user!)
+            try? await refreshBackendToken(for: user!)
             await loadUserProfile(for: user!, isInitial: false)
         }
     }
@@ -238,21 +245,22 @@ final class AuthViewModel: ObservableObject {
         }
         
         do {
-            await refreshBackendToken(for: user)
+            try await refreshBackendToken(for: user)
             try await UserProfileService.shared.createUserProfileIfNeeded(user: user)
             profile = try await UserProfileService.shared.fetchUserProfile(uid: user.uid)
         } catch {
             profile = nil
-            errorMessage = "We couldn’t load your account details. Please try again."
+            errorMessage = profileFriendlyMessage(for: error)
         }
     }
 
-    private func refreshBackendToken(for user: User) async {
+    private func refreshBackendToken(for user: User) async throws {
         do {
             let token = try await fetchFirebaseIdToken(for: user)
             try KeychainManager.shared.save(key: "trim_access_token", value: token)
         } catch {
             try? KeychainManager.shared.delete(key: "trim_access_token")
+            throw error
         }
     }
     
@@ -270,6 +278,41 @@ final class AuthViewModel: ObservableObject {
                 continuation.resume(returning: token)
             }
         }
+    }
+    
+    private func profileFriendlyMessage(for error: Error) -> String {
+        if let networkError = error as? NetworkError, let message = networkError.errorDescription {
+            if case .requestFailed = networkError, TrimApiService.shared.isUsingLocalBackend {
+                return "The app can’t reach the local server. Make sure the backend is running, then try again."
+            }
+            return message
+        }
+        
+        if let urlError = error as? URLError {
+            switch urlError.code {
+            case .notConnectedToInternet:
+                return "You’re offline. Connect to the internet and try again."
+            case .cannotFindHost, .cannotConnectToHost, .timedOut:
+                if TrimApiService.shared.isUsingLocalBackend {
+                    return "The app can’t reach the local server. Make sure the backend is running, then try again."
+                }
+                return "We couldn’t reach the server. Please try again."
+            default:
+                return "Network error. Please try again."
+            }
+        }
+        
+        let nsError = error as NSError
+        if let code = AuthErrorCode(rawValue: nsError.code) {
+            switch code {
+            case .networkError:
+                return "Network error. Check your connection and try again."
+            default:
+                break
+            }
+        }
+        
+        return "We couldn’t load your account details. Please try again."
     }
 }
 

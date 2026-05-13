@@ -1,6 +1,6 @@
 import Foundation
 
-struct UserProfile: Equatable {
+struct UserProfile: Equatable, Codable {
     let uid: String
     let email: String
     let createdAt: Date?

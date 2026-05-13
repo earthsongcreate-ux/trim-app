@@ -30,8 +30,10 @@ struct RootView: View {
             if authViewModel.isCheckingSession {
                 loadingView
             } else if authViewModel.isAuthenticated {
-                if authViewModel.isLoadingProfile || authViewModel.profile == nil {
+                if authViewModel.isLoadingProfile {
                     loadingView
+                } else if authViewModel.profile == nil {
+                    profileErrorView
                 } else if authViewModel.profile?.onboardingComplete == false {
                     SecureView {
                         OnboardingView { firstName, monthlyIncome, monthlySavingsGoal in
@@ -108,6 +110,50 @@ struct RootView: View {
             ProgressView()
                 .progressViewStyle(CircularProgressViewStyle(tint: TrimDesignSystem.Colors.accentPrimary))
                 .scaleEffect(1.2)
+        }
+    }
+    
+    private var profileErrorView: some View {
+        ZStack {
+            TrimDesignSystem.Colors.background
+                .ignoresSafeArea()
+            
+            VStack(spacing: TrimDesignSystem.Spacing.l) {
+                Image(systemName: "exclamationmark.triangle.fill")
+                    .font(.system(size: 28, weight: .semibold))
+                    .foregroundColor(TrimDesignSystem.Colors.error)
+                
+                Text(authViewModel.errorMessage ?? "We couldn’t load your account details. Please try again.")
+                    .font(TrimDesignSystem.Typography.body)
+                    .foregroundColor(TrimDesignSystem.Colors.textPrimary)
+                    .multilineTextAlignment(.center)
+                    .padding(.horizontal, TrimDesignSystem.Spacing.xl)
+                
+                VStack(spacing: TrimDesignSystem.Spacing.m) {
+                    Button {
+                        Task { await authViewModel.retryProfileLoad() }
+                    } label: {
+                        Text("Try Again")
+                            .font(TrimDesignSystem.Typography.subheader)
+                            .foregroundColor(TrimDesignSystem.Colors.background)
+                            .frame(maxWidth: .infinity)
+                            .padding()
+                            .background(TrimDesignSystem.Colors.accentPrimary)
+                            .cornerRadius(TrimDesignSystem.Radius.medium)
+                    }
+                    .trimPressAnimation()
+                    
+                    Button {
+                        authViewModel.signOut()
+                    } label: {
+                        Text("Sign Out")
+                            .font(TrimDesignSystem.Typography.body)
+                            .foregroundColor(TrimDesignSystem.Colors.textSecondary)
+                    }
+                    .trimPressAnimation()
+                }
+                .padding(.horizontal, TrimDesignSystem.Spacing.xl)
+            }
         }
     }
     

@@ -236,10 +236,6 @@ struct OnboardingView: View {
             Spacer()
             
             HStack(spacing: TrimDesignSystem.Spacing.s) {
-                Image("logo")
-                    .resizable()
-                    .scaledToFit()
-                    .frame(height: 32)
                 Text("TRIM")
                     .font(.system(size: 32, weight: .heavy, design: .default))
                     .kerning(1.5)

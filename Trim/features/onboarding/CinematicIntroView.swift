@@ -40,10 +40,6 @@ struct CinematicIntroView: View {
                     if phase == .logo || phase == .initial {
                         VStack(spacing: TrimDesignSystem.Spacing.m) {
                             HStack(spacing: TrimDesignSystem.Spacing.s) {
-                                Image("logo")
-                                    .resizable()
-                                    .scaledToFit()
-                                    .frame(height: 48)
                                 Text("TRIM")
                                     .font(.system(size: 48, weight: .heavy, design: .default))
                                     .kerning(2.0)

@@ -134,11 +134,6 @@ struct LoginView: View {
     private var header: some View {
         VStack(alignment: .leading, spacing: 10) {
             HStack(spacing: TrimDesignSystem.Spacing.s) {
-                Image("logo")
-                    .resizable()
-                    .scaledToFit()
-                    .frame(width: 40, height: 40)
-                
                 Text("Trim")
                     .font(.system(size: 34, weight: .heavy))
                     .foregroundColor(TrimDesignSystem.Colors.textPrimary)

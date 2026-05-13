@@ -31,10 +31,14 @@ class TrimApiService {
     
     /// Backend base URL — injected via environment or defaults to localhost
     private let baseURL: String = {
-        ProcessInfo.processInfo.environment["TRIM_API_URL"] ?? "http://localhost:8000"
+        ProcessInfo.processInfo.environment["TRIM_API_URL"] ?? "http://127.0.0.1:8000"
     }()
     
     private init() {}
+    
+    var isUsingLocalBackend: Bool {
+        baseURL.contains("127.0.0.1") || baseURL.contains("localhost")
+    }
 }
 
 /// Response shape from the /api/insights endpoint.
@@ -49,7 +53,7 @@ extension TrimApiService {
     
     private func getAuthHeaders() throws -> [String: String] {
         let token = try KeychainManager.shared.retrieve(key: "trim_access_token")
-        if token.isEmpty { throw NetworkError.requestFailed }
+        if token.isEmpty { throw NetworkError.unauthorized }
         return [
             "Authorization": "Bearer \(token)",
             "Content-Type": "application/json"
@@ -71,6 +75,27 @@ extension TrimApiService {
             throw NetworkError.requestFailed
         }
     }
+    
+    private func makeISO8601Decoder() -> JSONDecoder {
+        let decoder = JSONDecoder()
+        let withFractional = ISO8601DateFormatter()
+        withFractional.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
+        let withoutFractional = ISO8601DateFormatter()
+        withoutFractional.formatOptions = [.withInternetDateTime]
+        
+        decoder.dateDecodingStrategy = .custom { decoder in
+            let container = try decoder.singleValueContainer()
+            let string = try container.decode(String.self)
+            if let date = withFractional.date(from: string) {
+                return date
+            }
+            if let date = withoutFractional.date(from: string) {
+                return date
+            }
+            throw DecodingError.dataCorruptedError(in: container, debugDescription: "Invalid date format")
+        }
+        return decoder
+    }
 
     func fetchDashboardData() async throws -> FinancialOverview {
         // Replace with real backend call
@@ -80,6 +105,107 @@ extension TrimApiService {
             healthScore: 82,
             ytdReturn: 0.184
         )
+    }
+    
+    func fetchUserProfile() async throws -> UserProfile {
+        guard let url = URL(string: "\(baseURL)/api/v1/profile/me") else {
+            throw NetworkError.invalidURL
+        }
+        var request = URLRequest(url: url)
+        request.httpMethod = "GET"
+        request.allHTTPHeaderFields = try getAuthHeaders()
+        
+        let (data, response) = try await URLSession.shared.data(for: request)
+        try verifyResponse(response)
+        
+        do {
+            return try makeISO8601Decoder().decode(UserProfile.self, from: data)
+        } catch {
+            print("[TrimApiService] Failed to decode profile: \(error)")
+            throw NetworkError.decodingError
+        }
+    }
+    
+    func updateUserProfile(
+        firstName: String?,
+        monthlyIncome: Int?,
+        monthlySavingsGoal: Int?,
+        onboardingComplete: Bool?
+    ) async throws -> UserProfile {
+        guard let url = URL(string: "\(baseURL)/api/v1/profile/me") else {
+            throw NetworkError.invalidURL
+        }
+        var request = URLRequest(url: url)
+        request.httpMethod = "PATCH"
+        request.allHTTPHeaderFields = try getAuthHeaders()
+        
+        var body: [String: Any] = [:]
+        if let firstName { body["firstName"] = firstName }
+        if let monthlyIncome { body["monthlyIncome"] = monthlyIncome }
+        if let monthlySavingsGoal { body["monthlySavingsGoal"] = monthlySavingsGoal }
+        if let onboardingComplete { body["onboardingComplete"] = onboardingComplete }
+        request.httpBody = try JSONSerialization.data(withJSONObject: body)
+        
+        let (data, response) = try await URLSession.shared.data(for: request)
+        try verifyResponse(response)
+        
+        do {
+            return try makeISO8601Decoder().decode(UserProfile.self, from: data)
+        } catch {
+            print("[TrimApiService] Failed to decode updated profile: \(error)")
+            throw NetworkError.decodingError
+        }
+    }
+    
+    func fetchFoundingAnnualOfferState() async throws -> FoundingAnnualOfferState {
+        guard let url = URL(string: "\(baseURL)/api/v1/profile/founding-annual-offer") else {
+            throw NetworkError.invalidURL
+        }
+        var request = URLRequest(url: url)
+        request.httpMethod = "GET"
+        request.allHTTPHeaderFields = try getAuthHeaders()
+        
+        let (data, response) = try await URLSession.shared.data(for: request)
+        try verifyResponse(response)
+        
+        do {
+            return try JSONDecoder().decode(FoundingAnnualOfferState.self, from: data)
+        } catch {
+            print("[TrimApiService] Failed to decode offer state: \(error)")
+            throw NetworkError.decodingError
+        }
+    }
+    
+    func startPremiumTrial(
+        plan: SubscriptionPlan,
+        trialDays: Int,
+        annualPriceCents: Int,
+        annualCurrency: String
+    ) async throws -> UserProfile {
+        guard let url = URL(string: "\(baseURL)/api/v1/profile/start-trial") else {
+            throw NetworkError.invalidURL
+        }
+        var request = URLRequest(url: url)
+        request.httpMethod = "POST"
+        request.allHTTPHeaderFields = try getAuthHeaders()
+        
+        let body: [String: Any] = [
+            "plan": plan.rawValue,
+            "trialDays": trialDays,
+            "annualPriceCents": annualPriceCents,
+            "annualCurrency": annualCurrency,
+        ]
+        request.httpBody = try JSONSerialization.data(withJSONObject: body)
+        
+        let (data, response) = try await URLSession.shared.data(for: request)
+        try verifyResponse(response)
+        
+        do {
+            return try makeISO8601Decoder().decode(UserProfile.self, from: data)
+        } catch {
+            print("[TrimApiService] Failed to decode trial profile: \(error)")
+            throw NetworkError.decodingError
+        }
     }
 
     func fetchSubscriptions() async throws -> [Subscription] {

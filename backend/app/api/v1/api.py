@@ -11,6 +11,7 @@ from app.api.v1.endpoints import (
     paywall,
     feedback,
     currency,
+    profile,
 )
 
 api_router = APIRouter()
@@ -26,3 +27,4 @@ api_router.include_router(savings.router, prefix="/savings", tags=["savings"])
 api_router.include_router(paywall.router, prefix="/paywall", tags=["paywall"])
 api_router.include_router(feedback.router, prefix="/feedback", tags=["feedback"])
 api_router.include_router(currency.router, prefix="/currency", tags=["currency"])
+api_router.include_router(profile.router, prefix="/profile", tags=["profile"])

@@ -16,6 +16,7 @@ def get_current_user(
     try:
         decoded_token = auth.verify_id_token(token)
         email = decoded_token.get('email')
+        firebase_uid = decoded_token.get("uid") or decoded_token.get("user_id") or decoded_token.get("sub")
         
         user = db.query(User).filter(User.email == email).first()
         if not user:
@@ -23,6 +24,7 @@ def get_current_user(
             db.add(user)
             db.commit()
             db.refresh(user)
+        setattr(user, "firebase_uid", firebase_uid or "")
         return user
     except Exception as e:
         raise HTTPException(
