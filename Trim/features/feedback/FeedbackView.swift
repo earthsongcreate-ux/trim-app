@@ -1,4 +1,5 @@
 import SwiftUI
+import FirebaseAuth
 
 // MARK: - Inline Feedback Row
 
@@ -397,9 +398,7 @@ struct CorrectionSheetView: View {
 class FeedbackService {
     static let shared = FeedbackService()
     
-    private let baseURL: String = {
-        ProcessInfo.processInfo.environment["TRIM_API_URL"] ?? "http://localhost:8000"
-    }()
+    private var baseURL: String { ApiConfig.baseURL }
     
     private init() {}
     
@@ -466,8 +465,9 @@ class FeedbackService {
     }
     
     private func currentUserId() -> String {
-        // In production, use the authenticated user's ID
-        // For now, use a stable device-based identifier
+        if let uid = Auth.auth().currentUser?.uid, !uid.isEmpty {
+            return uid
+        }
         return UIDevice.current.identifierForVendor?.uuidString ?? "anonymous"
     }
 }

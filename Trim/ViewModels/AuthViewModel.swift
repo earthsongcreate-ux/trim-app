@@ -16,6 +16,11 @@ final class AuthViewModel: ObservableObject {
     
     init(authService: AuthService? = nil) {
         self.authService = authService ?? .shared
+        TrimApiService.shared.onUnauthorized = { [weak self] in
+            Task { @MainActor in
+                self?.signOut()
+            }
+        }
         start()
     }
     
@@ -246,6 +251,7 @@ final class AuthViewModel: ObservableObject {
         
         do {
             try await refreshBackendToken(for: user)
+            try await TrimApiService.shared.syncUser()
             try await UserProfileService.shared.createUserProfileIfNeeded(user: user)
             profile = try await UserProfileService.shared.fetchUserProfile(uid: user.uid)
         } catch {

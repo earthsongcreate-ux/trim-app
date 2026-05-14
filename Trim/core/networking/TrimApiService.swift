@@ -1,4 +1,5 @@
 import Foundation
+import FirebaseAuth
 
 enum NetworkError: LocalizedError {
     case invalidURL
@@ -29,12 +30,11 @@ enum NetworkError: LocalizedError {
 class TrimApiService {
     static let shared = TrimApiService()
     
-    /// Backend base URL — injected via environment or defaults to localhost
-    private let baseURL: String = {
-        ProcessInfo.processInfo.environment["TRIM_API_URL"] ?? "http://127.0.0.1:8000"
-    }()
+    var onUnauthorized: (() -> Void)?
     
     private init() {}
+    
+    private var baseURL: String { ApiConfig.baseURL }
     
     var isUsingLocalBackend: Bool {
         baseURL.contains("127.0.0.1") || baseURL.contains("localhost")
@@ -51,9 +51,28 @@ private struct InsightsResponse: Codable {
 
 extension TrimApiService {
     
-    private func getAuthHeaders() throws -> [String: String] {
-        let token = try KeychainManager.shared.retrieve(key: "trim_access_token")
-        if token.isEmpty { throw NetworkError.unauthorized }
+    private func fetchFirebaseIdToken(forceRefresh: Bool) async throws -> String {
+        guard let user = Auth.auth().currentUser else {
+            throw NetworkError.unauthorized
+        }
+        return try await withCheckedThrowingContinuation { continuation in
+            user.getIDTokenForcingRefresh(forceRefresh) { token, error in
+                if let error {
+                    continuation.resume(throwing: error)
+                    return
+                }
+                guard let token, !token.isEmpty else {
+                    continuation.resume(throwing: NetworkError.unauthorized)
+                    return
+                }
+                continuation.resume(returning: token)
+            }
+        }
+    }
+    
+    private func getAuthHeaders(forceRefresh: Bool = false) async throws -> [String: String] {
+        let token = try await fetchFirebaseIdToken(forceRefresh: forceRefresh)
+        try? KeychainManager.shared.save(key: "trim_access_token", value: token)
         return [
             "Authorization": "Bearer \(token)",
             "Content-Type": "application/json"
@@ -96,6 +115,32 @@ extension TrimApiService {
         }
         return decoder
     }
+    
+    private func send(_ request: URLRequest, retryOnUnauthorized: Bool = true) async throws -> Data {
+        do {
+            let (data, response) = try await URLSession.shared.data(for: request)
+            try verifyResponse(response)
+            return data
+        } catch let error as NetworkError {
+            if case .unauthorized = error, retryOnUnauthorized {
+                var refreshed = request
+                refreshed.allHTTPHeaderFields = try await getAuthHeaders(forceRefresh: true)
+                let (data, response) = try await URLSession.shared.data(for: refreshed)
+                do {
+                    try verifyResponse(response)
+                    return data
+                } catch let secondError as NetworkError {
+                    if case .unauthorized = secondError {
+                        onUnauthorized?()
+                    }
+                    throw secondError
+                }
+            }
+            throw error
+        } catch {
+            throw error
+        }
+    }
 
     func fetchDashboardData() async throws -> FinancialOverview {
         // Replace with real backend call
@@ -113,10 +158,9 @@ extension TrimApiService {
         }
         var request = URLRequest(url: url)
         request.httpMethod = "GET"
-        request.allHTTPHeaderFields = try getAuthHeaders()
+        request.allHTTPHeaderFields = try await getAuthHeaders()
         
-        let (data, response) = try await URLSession.shared.data(for: request)
-        try verifyResponse(response)
+        let data = try await send(request)
         
         do {
             return try makeISO8601Decoder().decode(UserProfile.self, from: data)
@@ -124,6 +168,16 @@ extension TrimApiService {
             print("[TrimApiService] Failed to decode profile: \(error)")
             throw NetworkError.decodingError
         }
+    }
+
+    func syncUser() async throws {
+        guard let url = URL(string: "\(baseURL)/api/v1/auth/sync-user") else {
+            throw NetworkError.invalidURL
+        }
+        var request = URLRequest(url: url)
+        request.httpMethod = "POST"
+        request.allHTTPHeaderFields = try await getAuthHeaders()
+        _ = try await send(request)
     }
     
     func updateUserProfile(
@@ -137,7 +191,7 @@ extension TrimApiService {
         }
         var request = URLRequest(url: url)
         request.httpMethod = "PATCH"
-        request.allHTTPHeaderFields = try getAuthHeaders()
+        request.allHTTPHeaderFields = try await getAuthHeaders()
         
         var body: [String: Any] = [:]
         if let firstName { body["firstName"] = firstName }
@@ -146,8 +200,7 @@ extension TrimApiService {
         if let onboardingComplete { body["onboardingComplete"] = onboardingComplete }
         request.httpBody = try JSONSerialization.data(withJSONObject: body)
         
-        let (data, response) = try await URLSession.shared.data(for: request)
-        try verifyResponse(response)
+        let data = try await send(request)
         
         do {
             return try makeISO8601Decoder().decode(UserProfile.self, from: data)
@@ -163,10 +216,9 @@ extension TrimApiService {
         }
         var request = URLRequest(url: url)
         request.httpMethod = "GET"
-        request.allHTTPHeaderFields = try getAuthHeaders()
+        request.allHTTPHeaderFields = try await getAuthHeaders()
         
-        let (data, response) = try await URLSession.shared.data(for: request)
-        try verifyResponse(response)
+        let data = try await send(request)
         
         do {
             return try JSONDecoder().decode(FoundingAnnualOfferState.self, from: data)
@@ -187,7 +239,7 @@ extension TrimApiService {
         }
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
-        request.allHTTPHeaderFields = try getAuthHeaders()
+        request.allHTTPHeaderFields = try await getAuthHeaders()
         
         let body: [String: Any] = [
             "plan": plan.rawValue,
@@ -197,8 +249,7 @@ extension TrimApiService {
         ]
         request.httpBody = try JSONSerialization.data(withJSONObject: body)
         
-        let (data, response) = try await URLSession.shared.data(for: request)
-        try verifyResponse(response)
+        let data = try await send(request)
         
         do {
             return try makeISO8601Decoder().decode(UserProfile.self, from: data)
@@ -224,10 +275,9 @@ extension TrimApiService {
         }
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
-        request.allHTTPHeaderFields = try getAuthHeaders()
+        request.allHTTPHeaderFields = try await getAuthHeaders()
         
-        let (data, response) = try await URLSession.shared.data(for: request)
-        try verifyResponse(response)
+        let data = try await send(request)
         
         let result = try JSONDecoder().decode([String: String].self, from: data)
         return result["link_token"] ?? ""
@@ -239,12 +289,10 @@ extension TrimApiService {
         }
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
-        request.allHTTPHeaderFields = try getAuthHeaders()
+        request.allHTTPHeaderFields = try await getAuthHeaders()
         let body = ["public_token": publicToken, "institution_name": institutionName]
         request.httpBody = try JSONSerialization.data(withJSONObject: body)
-        
-        let (_, response) = try await URLSession.shared.data(for: request)
-        try verifyResponse(response)
+        _ = try await send(request)
     }
     
     func syncTransactions() async throws {
@@ -253,10 +301,8 @@ extension TrimApiService {
         }
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
-        request.allHTTPHeaderFields = try getAuthHeaders()
-        
-        let (_, response) = try await URLSession.shared.data(for: request)
-        try verifyResponse(response)
+        request.allHTTPHeaderFields = try await getAuthHeaders()
+        _ = try await send(request)
     }
     
     func fetchTransactions() async throws -> [Transaction] {
@@ -265,10 +311,9 @@ extension TrimApiService {
         }
         var request = URLRequest(url: url)
         request.httpMethod = "GET"
-        request.allHTTPHeaderFields = try getAuthHeaders()
+        request.allHTTPHeaderFields = try await getAuthHeaders()
         
-        let (data, response) = try await URLSession.shared.data(for: request)
-        try verifyResponse(response)
+        let data = try await send(request)
         
         struct TransactionsResponse: Codable {
             let status: String
@@ -290,10 +335,9 @@ extension TrimApiService {
         }
         var request = URLRequest(url: url)
         request.httpMethod = "GET"
-        request.allHTTPHeaderFields = try getAuthHeaders()
+        request.allHTTPHeaderFields = try await getAuthHeaders()
         
-        let (data, response) = try await URLSession.shared.data(for: request)
-        try verifyResponse(response)
+        let data = try await send(request)
         
         do {
             let result = try JSONDecoder().decode(InsightsResponse.self, from: data)
@@ -350,9 +394,8 @@ extension TrimApiService {
         do {
             var request = URLRequest(url: url)
             request.httpMethod = "GET"
-            request.allHTTPHeaderFields = try getAuthHeaders()
-            let (data, response) = try await URLSession.shared.data(for: request)
-            try verifyResponse(response)
+            request.allHTTPHeaderFields = try await getAuthHeaders()
+            let data = try await send(request)
             let decoded = try JSONDecoder().decode(CoachingResponse.self, from: data)
             return decoded.coaching
         } catch {
@@ -369,9 +412,8 @@ extension TrimApiService {
         do {
             var request = URLRequest(url: url)
             request.httpMethod = "GET"
-            request.allHTTPHeaderFields = try getAuthHeaders()
-            let (data, response) = try await URLSession.shared.data(for: request)
-            try verifyResponse(response)
+            request.allHTTPHeaderFields = try await getAuthHeaders()
+            let data = try await send(request)
             let decoded = try JSONDecoder().decode(SavingsImpactResponse.self, from: data)
             if decoded.success {
                 return SavingsImpact(
@@ -404,9 +446,8 @@ extension TrimApiService {
         do {
             var request = URLRequest(url: url)
             request.httpMethod = "GET"
-            request.allHTTPHeaderFields = try getAuthHeaders()
-            let (data, response) = try await URLSession.shared.data(for: request)
-            try verifyResponse(response)
+            request.allHTTPHeaderFields = try await getAuthHeaders()
+            let data = try await send(request)
             return try JSONDecoder().decode(PaywallEvaluationResponse.self, from: data)
         } catch {
             print("[TrimApiService] Paywall evaluation failed: \(error.localizedDescription)")
@@ -421,14 +462,13 @@ extension TrimApiService {
         
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
-        request.allHTTPHeaderFields = try getAuthHeaders()
+        request.allHTTPHeaderFields = try await getAuthHeaders()
         
         let body = ["action": action]
         request.httpBody = try JSONSerialization.data(withJSONObject: body)
         
         do {
-            let (_, response) = try await URLSession.shared.data(for: request)
-            try verifyResponse(response)
+            _ = try await send(request)
         } catch {
             print("[TrimApiService] Paywall interact failed: \(error.localizedDescription)")
         }

@@ -43,6 +43,7 @@
 		FA4BF8C42F9FE92B007B8755 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA4BF8992F9FE92B007B8755 /* SettingsView.swift */; };
 		FA4BF8C52F9FE92B007B8755 /* PlaidLinkView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA4BF87C2F9FE92B007B8755 /* PlaidLinkView.swift */; };
 		FA4BF8C62F9FE92B007B8755 /* BankConnectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA4BF8872F9FE92B007B8755 /* BankConnectionView.swift */; };
+		FAD6572D2FB36AB00069A5C2 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = FAD6572B2FB36AB00069A5C2 /* GoogleService-Info.plist */; };
 		FAEF394D2FACE706002CD56B /* FirebaseAuth in Frameworks */ = {isa = PBXBuildFile; productRef = F13E57B1A1B2C3D4E5F60708 /* FirebaseAuth */; };
 		FAEF394E2FACE706002CD56B /* FirebaseFirestore in Frameworks */ = {isa = PBXBuildFile; productRef = F13E57B2A1B2C3D4E5F60708 /* FirebaseFirestore */; };
 		FAEF394F2FACE706002CD56B /* FirebaseAnalytics in Frameworks */ = {isa = PBXBuildFile; productRef = F13E57B3A1B2C3D4E5F60708 /* FirebaseAnalytics */; };
@@ -56,7 +57,7 @@
 		FB3E97C5A1D24F3B8E1C9C07 /* MainTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB3E97C5A1D24F3B8E1C9B07 /* MainTabView.swift */; };
 		FB3E97C5A1D24F3B8E1C9D22 /* UserProfile.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB3E97C5A1D24F3B8E1C9D21 /* UserProfile.swift */; };
 		FB3E97C5A1D24F3B8E1C9D24 /* UserProfileService.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB3E97C5A1D24F3B8E1C9D23 /* UserProfileService.swift */; };
-		FAD6572D2FB36AB00069A5C2 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = FAD6572B2FB36AB00069A5C2 /* GoogleService-Info.plist */; };
+		FBC0F1012FEF0001007B8755 /* ApiConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBC0F1002FEF0001007B8755 /* ApiConfig.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -129,6 +130,7 @@
 		FB3E97C5A1D24F3B8E1C9B07 /* MainTabView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainTabView.swift; sourceTree = "<group>"; };
 		FB3E97C5A1D24F3B8E1C9D21 /* UserProfile.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserProfile.swift; sourceTree = "<group>"; };
 		FB3E97C5A1D24F3B8E1C9D23 /* UserProfileService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserProfileService.swift; sourceTree = "<group>"; };
+		FBC0F1002FEF0001007B8755 /* ApiConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ApiConfig.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -241,6 +243,7 @@
 			isa = PBXGroup;
 			children = (
 				FA4BF86E2F9FE92B007B8755 /* TrimApiService.swift */,
+				FBC0F1002FEF0001007B8755 /* ApiConfig.swift */,
 			);
 			path = networking;
 			sourceTree = "<group>";
@@ -567,9 +570,6 @@
 		};
 /* End PBXProject section */
 
-/* Begin PBXBuildRule section */
-				/* End PBXBuildRule section */
-
 /* Begin PBXResourcesBuildPhase section */
 		FA4BF8362F9FE802007B8755 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
@@ -629,6 +629,7 @@
 				FA4BF8BA2F9FE92B007B8755 /* ActivityTrackingModifier.swift in Sources */,
 				FA4BF8BB2F9FE92B007B8755 /* SessionLockIndicator.swift in Sources */,
 				FA4BF8BC2F9FE92B007B8755 /* TrimApiService.swift in Sources */,
+				FBC0F1012FEF0001007B8755 /* ApiConfig.swift in Sources */,
 				FA4BF8BD2F9FE92B007B8755 /* CurrencyAmountView.swift in Sources */,
 				FA4BF8BF2F9FE92B007B8755 /* CurrencyService.swift in Sources */,
 				FA4BF8C02F9FE92B007B8755 /* InsightsView.swift in Sources */,
@@ -807,6 +808,7 @@
 				DEVELOPMENT_TEAM = SC5G3FJ7FG;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = Trim/Info.plist;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -839,6 +841,7 @@
 				DEVELOPMENT_TEAM = SC5G3FJ7FG;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = Trim/Info.plist;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;

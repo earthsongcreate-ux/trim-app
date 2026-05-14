@@ -115,16 +115,20 @@ async def update_my_profile(
     if req.firstName is not None:
         cleaned = req.firstName.strip()
         profile.first_name = cleaned if cleaned else None
+        current_user.full_name = profile.first_name
     if req.monthlyIncome is not None:
         profile.monthly_income = max(int(req.monthlyIncome), 0)
     if req.monthlySavingsGoal is not None:
         profile.monthly_savings_goal = max(int(req.monthlySavingsGoal), 0)
     if req.onboardingComplete is not None:
         profile.onboarding_complete = bool(req.onboardingComplete)
+        current_user.onboarding_complete = bool(req.onboardingComplete)
 
+    db.add(current_user)
     db.add(profile)
     db.commit()
     db.refresh(profile)
+    db.refresh(current_user)
     return _to_response(current_user, profile)
 
 
@@ -156,6 +160,8 @@ async def start_trial(
     profile.subscription_status = "trial"
     profile.trial_days = int(req.trialDays)
     profile.trial_started_at = datetime.now(timezone.utc)
+    current_user.plan = plan
+    db.add(current_user)
 
     if plan == "annual":
         limit = 250
@@ -176,4 +182,5 @@ async def start_trial(
     db.add(profile)
     db.commit()
     db.refresh(profile)
+    db.refresh(current_user)
     return _to_response(current_user, profile)

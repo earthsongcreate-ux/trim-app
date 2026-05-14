@@ -1,4 +1,5 @@
 from pydantic_settings import BaseSettings, SettingsConfigDict
+from pydantic import Field
 
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(env_file=".env", extra="ignore")
@@ -6,17 +7,22 @@ class Settings(BaseSettings):
     PROJECT_NAME: str = "Trim API"
     VERSION: str = "1.0.0"
     API_V1_STR: str = "/api/v1"
+
+    ENV: str = Field(default="development")
     
     # Security
     SECRET_KEY: str = "CHANGE_ME_IN_PRODUCTION"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 60 * 24 * 8  # 8 days
     
     # Database
+    DATABASE_URL: str = ""
     POSTGRES_SERVER: str = "localhost"
     POSTGRES_USER: str = "trim_user"
     POSTGRES_PASSWORD: str = "trim_password"
     POSTGRES_DB: str = "trim_db"
     POSTGRES_PORT: str = "5432"
+
+    CORS_ORIGINS: str = ""
     
     # Plaid
     PLAID_CLIENT_ID: str = ""
@@ -25,6 +31,9 @@ class Settings(BaseSettings):
 
     ENCRYPTION_KEY: str = ""
 
+    FIREBASE_PROJECT_ID: str = ""
+    FIREBASE_CLIENT_EMAIL: str = ""
+    FIREBASE_PRIVATE_KEY: str = ""
     FIREBASE_SERVICE_ACCOUNT_PATH: str = ""
     FIREBASE_SERVICE_ACCOUNT_JSON: str = ""
     

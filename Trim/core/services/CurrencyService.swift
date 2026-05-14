@@ -109,7 +109,7 @@ final class CurrencyService: ObservableObject {
     
     /// Pushes the base currency preference to the backend.
     private func syncBaseCurrencyToBackend(_ currency: SupportedCurrency) async {
-        let baseURL = ProcessInfo.processInfo.environment["TRIM_API_URL"] ?? "http://localhost:8000"
+        let baseURL = ApiConfig.baseURL
         guard let url = URL(string: "\(baseURL)/api/v1/currency/user/default") else { return }
         
         var request = URLRequest(url: url)

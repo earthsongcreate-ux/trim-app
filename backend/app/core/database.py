@@ -4,6 +4,7 @@ from sqlalchemy.orm import sessionmaker
 from sqlalchemy.engine import URL
 import os
 from dotenv import load_dotenv
+from app.core.config import settings
 
 load_dotenv()
 
@@ -13,7 +14,7 @@ POSTGRES_USER = os.getenv("POSTGRES_USER", "trim_user")
 POSTGRES_PASSWORD = os.getenv("POSTGRES_PASSWORD", "trim_password")
 POSTGRES_DB = os.getenv("POSTGRES_DB", "trim_db")
 
-DATABASE_URL = os.getenv("DATABASE_URL", "").strip()
+DATABASE_URL = (os.getenv("DATABASE_URL", "") or settings.DATABASE_URL).strip()
 
 if DATABASE_URL and "REPLACE" not in DATABASE_URL:
     engine_url = DATABASE_URL
@@ -32,7 +33,7 @@ else:
         query=query,
     )
 
-engine = create_engine(engine_url)
+engine = create_engine(engine_url, pool_pre_ping=True)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 Base = declarative_base()
