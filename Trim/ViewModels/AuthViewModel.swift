@@ -60,19 +60,24 @@ final class AuthViewModel: ObservableObject {
     
     func signIn(email: String, password: String) async {
         await runAuthTask { [self] in
-            _ = try await self.authService.signIn(email: email, password: password)
+            let signedInUser = try await self.authService.signIn(email: email, password: password)
+            self.user = signedInUser
+            try await refreshBackendToken(for: signedInUser)
+            await loadUserProfile(for: signedInUser, isInitial: false)
         }
     }
     
     func signUp(email: String, password: String) async {
         await runAuthTask { [self] in
             let user = try await self.authService.createUser(email: email, password: password)
+            self.user = user
             try await refreshBackendToken(for: user)
             do {
                 try await UserProfileService.shared.createUserProfileIfNeeded(user: user)
                 self.profile = try await UserProfileService.shared.fetchUserProfile(uid: user.uid)
             } catch {
                 try? self.authService.signOut()
+                self.user = nil
                 throw AuthFlowError.profileSetupFailed
             }
         }
@@ -89,7 +94,10 @@ final class AuthViewModel: ObservableObject {
         do {
             try authService.signOut()
             try? KeychainManager.shared.delete(key: "trim_access_token")
+            user = nil
             profile = nil
+            isCheckingSession = false
+            isLoadingProfile = false
         } catch {
             errorMessage = "Couldn’t sign out. Please try again."
         }
