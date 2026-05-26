@@ -14,17 +14,22 @@ import Combine
 /// 2. **Session lock** — immediate lock on background; requires re-auth on return.
 /// 3. **Inactivity timeout** — locks after 90s of no interaction while in foreground.
 struct RootView: View {
-    
+    var body: some View {
+        if FirebaseBootstrap.isConfigured {
+            AuthenticatedRootView()
+        } else {
+            FirebaseSetupView()
+        }
+    }
+}
+
+struct AuthenticatedRootView: View {
     @StateObject private var authViewModel = AuthViewModel()
     @StateObject private var authManager = BiometricAuthManager()
     @StateObject private var sessionManager = SessionManager()
     @Environment(\.scenePhase) private var scenePhase
-    
-    /// Controls the privacy overlay that hides content in the app switcher.
     @State private var showPrivacyShield = false
-    
-    // MARK: - Body
-    
+
     var body: some View {
         ZStack {
             if authViewModel.isCheckingSession {
@@ -58,8 +63,6 @@ struct RootView: View {
                     .transition(SecurityTransition.lock)
             }
             
-            // Privacy shield — covers ALL content during inactive/background.
-            // Prevents financial data from appearing in the app switcher.
             if showPrivacyShield {
                 privacyOverlay
                     .zIndex(999)
@@ -71,27 +74,19 @@ struct RootView: View {
         .environmentObject(authViewModel)
         .environmentObject(authManager)
         .environmentObject(sessionManager)
-        
-        // MARK: — Lifecycle: Scene Phase
         .onChange(of: scenePhase) { _, newPhase in
             handleScenePhaseChange(newPhase)
         }
-        
-        // MARK: — Reactive: Auth Success → Start Session
         .onReceive(authManager.$isAuthenticated) { authenticated in
             if authenticated {
                 sessionManager.startSession()
             }
         }
-        
-        // MARK: — Reactive: Session Expired → Require Re-auth
         .onReceive(sessionManager.$isLocked) { locked in
             if locked && authManager.isAuthenticated {
                 authManager.logout()
             }
         }
-        
-        // MARK: — Reactive: Firebase Auth → Session Gate
         .onChange(of: authViewModel.isAuthenticated) { _, isAuthed in
             if isAuthed {
                 sessionManager.startSession()
@@ -100,9 +95,8 @@ struct RootView: View {
                 sessionManager.lock()
             }
         }
-        
     }
-    
+
     private var loadingView: some View {
         ZStack {
             TrimDesignSystem.Colors.background
@@ -189,26 +183,43 @@ struct RootView: View {
     private func handleScenePhaseChange(_ phase: ScenePhase) {
         switch phase {
         case .active:
-            // App is fully visible — remove privacy shield.
             showPrivacyShield = false
-            
-            // Session was locked on background entry.
-            // The reactive .onReceive binding already triggered logout,
-            // and LockView will auto-trigger re-authentication on appear.
-            
         case .inactive:
-            // App is transitioning (app switcher, notification shade, etc.).
-            // Show privacy shield immediately to hide financial data from
-            // the system snapshot used in the app switcher.
             showPrivacyShield = true
-            
         case .background:
-            // App is fully backgrounded — lock the session immediately.
             showPrivacyShield = true
             sessionManager.handleDidEnterBackground()
-            
         @unknown default:
             break
+        }
+    }
+}
+
+struct FirebaseSetupView: View {
+    var body: some View {
+        ZStack {
+            TrimDesignSystem.Colors.background
+                .ignoresSafeArea()
+            
+            VStack(spacing: TrimDesignSystem.Spacing.l) {
+                Image(systemName: "exclamationmark.triangle.fill")
+                    .font(.system(size: 44, weight: .semibold))
+                    .foregroundColor(TrimDesignSystem.Colors.error)
+                
+                Text("Firebase isn’t configured")
+                    .font(TrimDesignSystem.Typography.header)
+                    .foregroundColor(TrimDesignSystem.Colors.textPrimary)
+                
+                Text("To run Trim in the Simulator, add your GoogleService-Info.plist file to the app target.")
+                    .font(TrimDesignSystem.Typography.body)
+                    .foregroundColor(TrimDesignSystem.Colors.textSecondary)
+                    .multilineTextAlignment(.center)
+                    .padding(.horizontal, TrimDesignSystem.Spacing.xl)
+                
+                Link("Firebase iOS Setup Guide", destination: URL(string: "https://firebase.google.com/docs/ios/setup")!)
+                    .font(TrimDesignSystem.Typography.subheader)
+                    .foregroundColor(TrimDesignSystem.Colors.accentPrimary)
+            }
         }
     }
 }

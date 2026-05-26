@@ -78,7 +78,6 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		21A2AB3424F24401A242DAD8 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		BEE72FEA9AF44EBAAC42DAD9 /* Trim/Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Trim/Assets.xcassets; sourceTree = SOURCE_ROOT; };
 		FA4BF8382F9FE803007B8755 /* Trim.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Trim.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		FA4BF8452F9FE808007B8755 /* TrimTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = TrimTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -121,7 +120,7 @@
 		FA4BF8972F9FE92B007B8755 /* SavingsDashboardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SavingsDashboardView.swift; sourceTree = "<group>"; };
 		FA4BF8992F9FE92B007B8755 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		FA4BF89B2F9FE92B007B8755 /* NegotiationWorkflowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NegotiationWorkflowView.swift; sourceTree = "<group>"; };
-		FAD6572B2FB36AB00069A5C2 /* GoogleService-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
+		FAD6572B2FB36AB00069A5C2 /* GoogleService-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "../../GoogleService-Info.plist"; sourceTree = "<group>"; };
 		FB3E97C5A1D24F3B8E1C9B01 /* AuthService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthService.swift; sourceTree = "<group>"; };
 		FB3E97C5A1D24F3B8E1C9B02 /* AuthViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthViewModel.swift; sourceTree = "<group>"; };
 		FB3E97C5A1D24F3B8E1C9B03 /* AuthFlowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthFlowView.swift; sourceTree = "<group>"; };
@@ -203,7 +202,6 @@
 		FA4BF8392F9FE803007B8755 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				21A2AB3424F24401A242DAD8 /* README.md */,
 				FA4BF8382F9FE803007B8755 /* Trim.app */,
 				FA4BF8452F9FE808007B8755 /* TrimTests.xctest */,
 				FA4BF84F2F9FE808007B8755 /* TrimUITests.xctest */,
@@ -572,6 +570,9 @@
 		};
 /* End PBXProject section */
 
+/* Begin PBXBuildRule section */
+																					/* End PBXBuildRule section */
+
 /* Begin PBXResourcesBuildPhase section */
 		FA4BF8362F9FE802007B8755 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
@@ -718,7 +719,7 @@
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
-				ENABLE_USER_SCRIPT_SANDBOXING = NO;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu17;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_NO_COMMON_BLOCKS = YES;
@@ -782,7 +783,7 @@
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
-				ENABLE_USER_SCRIPT_SANDBOXING = NO;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu17;
 				GCC_NO_COMMON_BLOCKS = YES;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;

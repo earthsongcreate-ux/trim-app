@@ -1,20 +1,29 @@
 import SwiftUI
 import FirebaseCore
 
+enum FirebaseBootstrap {
+    static private(set) var isConfigured: Bool = false
+    
+    static func configureIfPossible() {
+        if FirebaseApp.app() != nil {
+            isConfigured = true
+            return
+        }
+        
+        guard FirebaseOptions.defaultOptions() != nil else {
+            isConfigured = false
+            return
+        }
+        
+        FirebaseApp.configure()
+        isConfigured = FirebaseApp.app() != nil
+    }
+}
+
 class AppDelegate: NSObject, UIApplicationDelegate {
   func application(_ application: UIApplication,
                    didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey : Any]? = nil) -> Bool {
-    if FirebaseApp.app() == nil {
-        if let url = Bundle.main.url(forResource: "GoogleService-Info", withExtension: "plist"),
-           let dict = NSDictionary(contentsOf: url),
-           let appId = dict["GOOGLE_APP_ID"] as? String,
-           !appId.isEmpty,
-           appId != "REPLACE_ME" {
-            FirebaseApp.configure()
-        } else {
-            print("Firebase not configured: missing or placeholder GoogleService-Info.plist")
-        }
-    }
+    FirebaseBootstrap.configureIfPossible()
     return true
   }
 }
@@ -22,6 +31,10 @@ class AppDelegate: NSObject, UIApplicationDelegate {
 @main
 struct TrimApp: App {
     @UIApplicationDelegateAdaptor(AppDelegate.self) var delegate
+    
+    init() {
+        FirebaseBootstrap.configureIfPossible()
+    }
     
     var body: some Scene {
         WindowGroup {
